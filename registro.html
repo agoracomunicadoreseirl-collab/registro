@@ -23,17 +23,26 @@
       margin: 0 0 12px;
     }
 
-    .topbar {
-      display: flex;
+    .filters {
+      display: grid;
+      grid-template-columns: 140px 1fr 1fr 1fr 1fr;
       gap: 8px;
-      flex-wrap: wrap;
       margin-bottom: 12px;
+      align-items: end;
+    }
+
+    .filter-item label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 4px;
     }
 
     button, input, select, textarea {
       font-size: 16px;
       padding: 10px;
       box-sizing: border-box;
+      width: 100%;
     }
 
     button {
@@ -62,6 +71,12 @@
     .box-value {
       font-size: 22px;
       font-weight: bold;
+    }
+
+    .status {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 10px;
     }
 
     .table-wrap {
@@ -98,12 +113,6 @@
       font-weight: bold;
     }
 
-    .status {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 10px;
-    }
-
     .modal {
       position: fixed;
       inset: 0;
@@ -112,6 +121,7 @@
       align-items: center;
       justify-content: center;
       padding: 16px;
+      z-index: 1000;
     }
 
     .modal.show {
@@ -124,6 +134,8 @@
       background: #fff;
       padding: 16px;
       border: 1px solid #ccc;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .form-group {
@@ -155,16 +167,73 @@
     }
 
     @media (max-width: 700px) {
-      .topbar {
-        flex-direction: column;
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
       }
 
       .summary {
         grid-template-columns: 1fr;
       }
 
-      button, input, select, textarea {
+      .actions {
+        flex-direction: column;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        background: transparent;
+        border: none;
+      }
+
+      table, tbody, tr, td {
+        display: block;
         width: 100%;
+      }
+
+      table {
+        min-width: 100%;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        background: #fff;
+        border: 1px solid #ddd;
+        margin-bottom: 12px;
+        padding: 6px 0;
+      }
+
+      td {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 8px 10px 8px 42%;
+        position: relative;
+        min-height: 20px;
+        word-break: break-word;
+      }
+
+      td:last-child {
+        border-bottom: none;
+      }
+
+      td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        top: 8px;
+        width: 36%;
+        font-weight: bold;
+        color: #666;
       }
     }
   </style>
@@ -173,18 +242,37 @@
   <div class="wrap">
     <h1>Registro de Pagos</h1>
 
-    <div class="topbar">
-      <button id="openModalBtn">Agregar</button>
+    <div class="filters">
+      <div class="filter-item">
+        <label>&nbsp;</label>
+        <button id="openModalBtn" type="button">Agregar</button>
+      </div>
 
-      <select id="clienteFiltro">
-        <option value="">Todos los clientes</option>
-      </select>
+      <div class="filter-item">
+        <label for="clienteFiltro">Cliente</label>
+        <select id="clienteFiltro">
+          <option value="">Todos los clientes</option>
+        </select>
+      </div>
 
-      <select id="tipoFiltro">
-        <option value="">Todos los tipos</option>
-        <option value="Ingreso">Ingreso</option>
-        <option value="Egreso">Egreso</option>
-      </select>
+      <div class="filter-item">
+        <label for="tipoFiltro">Tipo</label>
+        <select id="tipoFiltro">
+          <option value="">Todos los tipos</option>
+          <option value="Ingreso">Ingreso</option>
+          <option value="Egreso">Egreso</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <label for="fechaInicioFiltro">Fecha inicio</label>
+        <input id="fechaInicioFiltro" type="date">
+      </div>
+
+      <div class="filter-item">
+        <label for="fechaFinFiltro">Fecha fin</label>
+        <input id="fechaFinFiltro" type="date">
+      </div>
     </div>
 
     <div class="summary">
@@ -297,6 +385,8 @@
     const statusEl = document.getElementById('status');
     const clienteFiltro = document.getElementById('clienteFiltro');
     const tipoFiltro = document.getElementById('tipoFiltro');
+    const fechaInicioFiltro = document.getElementById('fechaInicioFiltro');
+    const fechaFinFiltro = document.getElementById('fechaFinFiltro');
     const tipoSelect = document.getElementById('tipo');
     const proveedorWrap = document.getElementById('proveedorWrap');
     const proveedorInput = document.getElementById('proveedor');
@@ -306,6 +396,23 @@
     const saveBtn = document.getElementById('saveBtn');
 
     let registros = [];
+
+    function getTodayLocal() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      const local = new Date(now.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function setFiltrosHoy() {
+      const hoy = getTodayLocal();
+      fechaInicioFiltro.value = hoy;
+      fechaFinFiltro.value = hoy;
+    }
+
+    function getFechaSolo(fechaTexto) {
+      return String(fechaTexto || '').slice(0, 10);
+    }
 
     function openModal() {
       modal.classList.add('show');
@@ -324,14 +431,32 @@
       if (!esEgreso) proveedorInput.value = '';
     }
 
+    function getRangoFechas() {
+      let inicio = fechaInicioFiltro.value;
+      let fin = fechaFinFiltro.value;
+
+      if (inicio && fin && inicio > fin) {
+        const temp = inicio;
+        inicio = fin;
+        fin = temp;
+      }
+
+      return { inicio, fin };
+    }
+
     function getFilteredData() {
       const cliente = clienteFiltro.value;
       const tipo = tipoFiltro.value;
+      const { inicio, fin } = getRangoFechas();
 
       return registros.filter(r => {
+        const fechaRegistro = getFechaSolo(r.fecha);
         const okCliente = !cliente || r.cliente === cliente;
         const okTipo = !tipo || r.tipo === tipo;
-        return okCliente && okTipo;
+        const okInicio = !inicio || fechaRegistro >= inicio;
+        const okFin = !fin || fechaRegistro <= fin;
+
+        return okCliente && okTipo && okInicio && okFin;
       });
     }
 
@@ -385,15 +510,15 @@
         const tr = document.createElement('tr');
 
         tr.innerHTML = `
-          <td>${escapeHtml(r.fecha || '')}</td>
-          <td class="${r.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(r.tipo || '')}</td>
-          <td>${escapeHtml(r.cliente || '')}</td>
-          <td>${escapeHtml(r.proveedor || '')}</td>
-          <td>${escapeHtml(r.banco || '')}</td>
-          <td>${escapeHtml(r.concepto || '')}</td>
-          <td>${escapeHtml(r.numeroOperacion || '')}</td>
-          <td>${Number(r.monto || 0).toFixed(2)}</td>
-          <td>${escapeHtml(r.observacion || '')}</td>
+          <td data-label="Fecha">${escapeHtml(r.fecha || '')}</td>
+          <td data-label="Tipo" class="${r.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(r.tipo || '')}</td>
+          <td data-label="Cliente">${escapeHtml(r.cliente || '')}</td>
+          <td data-label="Proveedor">${escapeHtml(r.proveedor || '')}</td>
+          <td data-label="Banco">${escapeHtml(r.banco || '')}</td>
+          <td data-label="Concepto">${escapeHtml(r.concepto || '')}</td>
+          <td data-label="N° Operación">${escapeHtml(r.numeroOperacion || '')}</td>
+          <td data-label="Monto">${Number(r.monto || 0).toFixed(2)}</td>
+          <td data-label="Observación">${escapeHtml(r.observacion || '')}</td>
         `;
 
         tablaBody.appendChild(tr);
@@ -465,12 +590,15 @@
     closeModalBtn.addEventListener('click', closeModal);
     clienteFiltro.addEventListener('change', renderTabla);
     tipoFiltro.addEventListener('change', renderTabla);
+    fechaInicioFiltro.addEventListener('change', renderTabla);
+    fechaFinFiltro.addEventListener('change', renderTabla);
     tipoSelect.addEventListener('change', toggleProveedor);
 
     modal.addEventListener('click', function (e) {
       if (e.target === modal) closeModal();
     });
 
+    setFiltrosHoy();
     toggleProveedor();
     cargarDatos();
   </script>
