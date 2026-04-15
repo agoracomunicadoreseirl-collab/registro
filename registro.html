@@ -14,7 +14,7 @@
     }
 
     .wrap {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
     }
 
@@ -30,7 +30,7 @@
       margin-bottom: 12px;
     }
 
-    button, input, select {
+    button, input, select, textarea {
       font-size: 16px;
       padding: 10px;
       box-sizing: border-box;
@@ -40,11 +40,28 @@
       cursor: pointer;
     }
 
-    .card {
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .box {
       background: #fff;
       border: 1px solid #ddd;
       padding: 12px;
-      margin-bottom: 12px;
+    }
+
+    .box-title {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .box-value {
+      font-size: 22px;
+      font-weight: bold;
     }
 
     .table-wrap {
@@ -56,7 +73,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 700px;
+      min-width: 950px;
     }
 
     th, td {
@@ -64,6 +81,7 @@
       padding: 10px;
       text-align: left;
       font-size: 14px;
+      vertical-align: top;
     }
 
     th {
@@ -78,6 +96,12 @@
     .badge-egreso {
       color: #b00020;
       font-weight: bold;
+    }
+
+    .status {
+      font-size: 14px;
+      color: #555;
+      margin-bottom: 10px;
     }
 
     .modal {
@@ -96,7 +120,7 @@
 
     .modal-box {
       width: 100%;
-      max-width: 420px;
+      max-width: 460px;
       background: #fff;
       padding: 16px;
       border: 1px solid #ccc;
@@ -113,8 +137,14 @@
     }
 
     .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group textarea {
       width: 100%;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
     }
 
     .actions {
@@ -124,23 +154,17 @@
       margin-top: 12px;
     }
 
-    .status {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 20px;
-      }
-
-      button, input, select {
-        width: 100%;
-      }
-
+    @media (max-width: 700px) {
       .topbar {
         flex-direction: column;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      button, input, select, textarea {
+        width: 100%;
       }
     }
   </style>
@@ -151,9 +175,31 @@
 
     <div class="topbar">
       <button id="openModalBtn">Agregar</button>
+
       <select id="clienteFiltro">
         <option value="">Todos los clientes</option>
       </select>
+
+      <select id="tipoFiltro">
+        <option value="">Todos los tipos</option>
+        <option value="Ingreso">Ingreso</option>
+        <option value="Egreso">Egreso</option>
+      </select>
+    </div>
+
+    <div class="summary">
+      <div class="box">
+        <div class="box-title">Total ingresos</div>
+        <div class="box-value" id="totalIngresos">0.00</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Total egresos</div>
+        <div class="box-value" id="totalEgresos">0.00</div>
+      </div>
+      <div class="box">
+        <div class="box-title">Saldo</div>
+        <div class="box-value" id="saldoTotal">0.00</div>
+      </div>
     </div>
 
     <div class="status" id="status">Cargando...</div>
@@ -166,9 +212,11 @@
             <th>Tipo</th>
             <th>Cliente</th>
             <th>Proveedor</th>
+            <th>Banco</th>
             <th>Concepto</th>
             <th>N° Operación</th>
             <th>Monto</th>
+            <th>Observación</th>
           </tr>
         </thead>
         <tbody id="tablaBody"></tbody>
@@ -200,6 +248,17 @@
         </div>
 
         <div class="form-group">
+          <label for="banco">Banco</label>
+          <select id="banco" name="banco" required>
+            <option value="">Seleccionar</option>
+            <option value="YAPE">YAPE</option>
+            <option value="BBVA">BBVA</option>
+            <option value="INTERBANK">INTERBANK</option>
+            <option value="BCP">BCP</option>
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="concepto">Concepto</label>
           <input id="concepto" name="concepto" type="text" required>
         </div>
@@ -214,6 +273,11 @@
           <input id="monto" name="monto" type="number" step="0.01" required>
         </div>
 
+        <div class="form-group">
+          <label for="observacion">Observación</label>
+          <textarea id="observacion" name="observacion"></textarea>
+        </div>
+
         <div class="actions">
           <button type="button" id="closeModalBtn">Cerrar</button>
           <button type="submit" id="saveBtn">Guardar</button>
@@ -223,7 +287,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyk3jmEcLYrLmUhuLCTCt_aKvryyG4h49cC85KPy_9iw1yUpuccCerjTeGtMxL3YBYL/exec';
+    const API_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
 
     const modal = document.getElementById('modal');
     const openModalBtn = document.getElementById('openModalBtn');
@@ -232,9 +296,13 @@
     const tablaBody = document.getElementById('tablaBody');
     const statusEl = document.getElementById('status');
     const clienteFiltro = document.getElementById('clienteFiltro');
+    const tipoFiltro = document.getElementById('tipoFiltro');
     const tipoSelect = document.getElementById('tipo');
     const proveedorWrap = document.getElementById('proveedorWrap');
     const proveedorInput = document.getElementById('proveedor');
+    const totalIngresosEl = document.getElementById('totalIngresos');
+    const totalEgresosEl = document.getElementById('totalEgresos');
+    const saldoTotalEl = document.getElementById('saldoTotal');
     const saveBtn = document.getElementById('saveBtn');
 
     let registros = [];
@@ -256,6 +324,17 @@
       if (!esEgreso) proveedorInput.value = '';
     }
 
+    function getFilteredData() {
+      const cliente = clienteFiltro.value;
+      const tipo = tipoFiltro.value;
+
+      return registros.filter(r => {
+        const okCliente = !cliente || r.cliente === cliente;
+        const okTipo = !tipo || r.tipo === tipo;
+        return okCliente && okTipo;
+      });
+    }
+
     function renderFiltroClientes() {
       const clientes = [...new Set(registros.map(r => (r.cliente || '').trim()).filter(Boolean))]
         .sort((a, b) => a.localeCompare(b, 'es'));
@@ -273,16 +352,32 @@
       clienteFiltro.value = clientes.includes(actual) ? actual : '';
     }
 
+    function renderResumen() {
+      const data = getFilteredData();
+
+      const totalIngresos = data
+        .filter(r => r.tipo === 'Ingreso')
+        .reduce((acc, r) => acc + Number(r.monto || 0), 0);
+
+      const totalEgresos = data
+        .filter(r => r.tipo === 'Egreso')
+        .reduce((acc, r) => acc + Number(r.monto || 0), 0);
+
+      const saldo = totalIngresos - totalEgresos;
+
+      totalIngresosEl.textContent = totalIngresos.toFixed(2);
+      totalEgresosEl.textContent = totalEgresos.toFixed(2);
+      saldoTotalEl.textContent = saldo.toFixed(2);
+    }
+
     function renderTabla() {
-      const cliente = clienteFiltro.value;
-      const data = cliente
-        ? registros.filter(r => r.cliente === cliente)
-        : registros;
+      const data = getFilteredData();
 
       tablaBody.innerHTML = '';
 
       if (data.length === 0) {
-        tablaBody.innerHTML = '<tr><td colspan="7">No hay registros</td></tr>';
+        tablaBody.innerHTML = '<tr><td colspan="9">No hay registros</td></tr>';
+        renderResumen();
         return;
       }
 
@@ -294,13 +389,17 @@
           <td class="${r.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(r.tipo || '')}</td>
           <td>${escapeHtml(r.cliente || '')}</td>
           <td>${escapeHtml(r.proveedor || '')}</td>
+          <td>${escapeHtml(r.banco || '')}</td>
           <td>${escapeHtml(r.concepto || '')}</td>
           <td>${escapeHtml(r.numeroOperacion || '')}</td>
           <td>${Number(r.monto || 0).toFixed(2)}</td>
+          <td>${escapeHtml(r.observacion || '')}</td>
         `;
 
         tablaBody.appendChild(tr);
       });
+
+      renderResumen();
     }
 
     function escapeHtml(value) {
@@ -319,7 +418,7 @@
         const res = await fetch(API_URL);
         const json = await res.json();
 
-        registros = (json.data || []).slice().reverse(); // últimos arriba
+        registros = (json.data || []).slice().reverse();
         renderFiltroClientes();
         renderTabla();
         statusEl.textContent = '';
@@ -365,6 +464,7 @@
     openModalBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
     clienteFiltro.addEventListener('change', renderTabla);
+    tipoFiltro.addEventListener('change', renderTabla);
     tipoSelect.addEventListener('change', toggleProveedor);
 
     modal.addEventListener('click', function (e) {
