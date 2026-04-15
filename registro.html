@@ -176,9 +176,12 @@
     <div class="topbar">
       <button id="openModalBtn">Agregar</button>
 
-      <select id="clienteFiltro">
-        <option value="">Todos los clientes</option>
-      </select>
+      <input
+        id="clienteFiltro"
+        type="text"
+        placeholder="Buscar por cliente"
+        list="clientesList"
+      >
 
       <select id="tipoFiltro">
         <option value="">Todos los tipos</option>
@@ -224,6 +227,9 @@
     </div>
   </div>
 
+  <datalist id="clientesList"></datalist>
+  <datalist id="proveedoresList"></datalist>
+
   <div class="modal" id="modal">
     <div class="modal-box">
       <h2 style="margin-top:0;font-size:18px;">Nuevo registro</h2>
@@ -239,12 +245,12 @@
 
         <div class="form-group">
           <label for="cliente">Cliente</label>
-          <input id="cliente" name="cliente" type="text" required>
+          <input id="cliente" name="cliente" type="text" list="clientesList" required>
         </div>
 
         <div class="form-group" id="proveedorWrap">
           <label for="proveedor">Proveedor</label>
-          <input id="proveedor" name="proveedor" type="text">
+          <input id="proveedor" name="proveedor" type="text" list="proveedoresList">
         </div>
 
         <div class="form-group">
@@ -287,7 +293,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbw7Q86RM3KAzuzyfN4qQMmvMc9YbYBaltbTZ7wqMsDNh_6LS_VIEBTO50mT_Gq8_VhUCg/exec';
+    const API_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI';
 
     const modal = document.getElementById('modal');
     const openModalBtn = document.getElementById('openModalBtn');
@@ -304,6 +310,8 @@
     const totalEgresosEl = document.getElementById('totalEgresos');
     const saldoTotalEl = document.getElementById('saldoTotal');
     const saveBtn = document.getElementById('saveBtn');
+    const clientesList = document.getElementById('clientesList');
+    const proveedoresList = document.getElementById('proveedoresList');
 
     let registros = [];
 
@@ -325,31 +333,40 @@
     }
 
     function getFilteredData() {
-      const cliente = clienteFiltro.value;
+      const clienteTexto = clienteFiltro.value.trim().toLowerCase();
       const tipo = tipoFiltro.value;
 
       return registros.filter(r => {
-        const okCliente = !cliente || r.cliente === cliente;
+        const clienteRegistro = (r.cliente || '').toLowerCase();
+        const okCliente = !clienteTexto || clienteRegistro.includes(clienteTexto);
         const okTipo = !tipo || r.tipo === tipo;
         return okCliente && okTipo;
       });
     }
 
-    function renderFiltroClientes() {
-      const clientes = [...new Set(registros.map(r => (r.cliente || '').trim()).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b, 'es'));
+    function renderDatalists() {
+      const clientes = [...new Set(
+        registros.map(r => (r.cliente || '').trim()).filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, 'es'));
 
-      const actual = clienteFiltro.value;
-      clienteFiltro.innerHTML = '<option value="">Todos los clientes</option>';
+      const proveedores = [...new Set(
+        registros.map(r => (r.proveedor || '').trim()).filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b, 'es'));
+
+      clientesList.innerHTML = '';
+      proveedoresList.innerHTML = '';
 
       clientes.forEach(cliente => {
         const option = document.createElement('option');
         option.value = cliente;
-        option.textContent = cliente;
-        clienteFiltro.appendChild(option);
+        clientesList.appendChild(option);
       });
 
-      clienteFiltro.value = clientes.includes(actual) ? actual : '';
+      proveedores.forEach(proveedor => {
+        const option = document.createElement('option');
+        option.value = proveedor;
+        proveedoresList.appendChild(option);
+      });
     }
 
     function renderResumen() {
@@ -419,7 +436,7 @@
         const json = await res.json();
 
         registros = (json.data || []).slice().reverse();
-        renderFiltroClientes();
+        renderDatalists();
         renderTabla();
         statusEl.textContent = '';
       } catch (error) {
@@ -463,7 +480,7 @@
 
     openModalBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
-    clienteFiltro.addEventListener('change', renderTabla);
+    clienteFiltro.addEventListener('input', renderTabla);
     tipoFiltro.addEventListener('change', renderTabla);
     tipoSelect.addEventListener('change', toggleProveedor);
 
