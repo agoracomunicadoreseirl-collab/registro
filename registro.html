@@ -599,18 +599,29 @@
       }
     }
 
-  @media (max-width: 759px) {
+ @media (max-width: 759px) {
+      html,
+      body {
+        overflow-x: hidden;
+      }
+
+      .wrap {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
       .panel,
       .section {
         overflow: hidden;
         padding: 12px;
-        
       }
 
       .filters-grid,
       .actions-grid,
       .summary-grid {
         min-width: 0;
+        width: 100%;
       }
 
       .field,
@@ -629,12 +640,8 @@
         max-width: 100%;
       }
 
-    #btnActualizarEstado {
+      #btnActualizarEstado {
         min-height: 50px;
-      }
-
-      .field-date input[type="date"] {
-        min-height: 48px;
       }
 
       .field-date input[type="date"] {
@@ -642,11 +649,15 @@
         width: 100%;
         max-width: 100%;
         min-width: 0;
+        min-height: 48px;
         margin: 0;
-        padding: 11px 10px;
+        padding: 11px 8px;
         font-size: 14px;
         line-height: 1.2;
         border-radius: 14px;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
       }
     }
 
@@ -1190,11 +1201,14 @@
     }
 
     function setFiltrosHoy() {
-      const hoy = getTodayLocal();
-      fechaInicioFiltro.value = hoy;
-      fechaFinFiltro.value = hoy;
-      renderMovimientosFiltrados();
-    }
+  const hoy = getTodayLocal();
+  fechaInicioFiltro.value = hoy;
+  fechaFinFiltro.value = hoy;
+
+  if (detalleTrabajo) {
+    renderMovimientosFiltrados();
+  }
+}
 
     function setFiltros7Dias() {
       const hoy = getTodayLocal();
@@ -1537,7 +1551,7 @@
     });
 
     loadPreferences();
-    setFiltrosTodo();
+    setFiltrosHoy();
     loadTrabajos();
   </script>
 </body>
