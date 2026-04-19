@@ -5,10 +5,14 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Registro de Pagos</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 12px;
       background: #f5f5f5;
       color: #222;
     }
@@ -19,16 +23,28 @@
     }
 
     h1 {
-      font-size: 22px;
+      font-size: 20px;
       margin: 0 0 12px;
     }
 
-    .filters {
+    .filters,
+    .quick-filters,
+    .summary {
       display: grid;
-      grid-template-columns: 140px 1fr 1fr 1fr 1fr;
       gap: 8px;
       margin-bottom: 12px;
-      align-items: end;
+    }
+
+    .filters {
+      grid-template-columns: 1fr;
+    }
+
+    .quick-filters {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .summary {
+      grid-template-columns: 1fr;
     }
 
     .filter-item label {
@@ -38,22 +54,20 @@
       margin-bottom: 4px;
     }
 
-    button, input, select, textarea {
+    button,
+    input,
+    select,
+    textarea {
       font-size: 16px;
       padding: 10px;
-      box-sizing: border-box;
       width: 100%;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 0;
     }
 
     button {
       cursor: pointer;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
     }
 
     .box {
@@ -80,27 +94,57 @@
     }
 
     .table-wrap {
-      overflow-x: auto;
-      background: #fff;
-      border: 1px solid #ddd;
+      overflow: visible;
+      background: transparent;
+      border: none;
+    }
+
+    table,
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
     }
 
     table {
-      width: 100%;
+      min-width: 100%;
       border-collapse: collapse;
-      min-width: 950px;
     }
 
-    th, td {
-      border-bottom: 1px solid #e5e5e5;
-      padding: 10px;
-      text-align: left;
+    thead {
+      display: none;
+    }
+
+    tr {
+      background: #fff;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      padding: 6px 0;
+    }
+
+    td {
+      border: none;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 8px 10px 8px 42%;
+      position: relative;
+      min-height: 20px;
+      word-break: break-word;
       font-size: 14px;
-      vertical-align: top;
     }
 
-    th {
-      background: #fafafa;
+    td:last-child {
+      border-bottom: none;
+    }
+
+    td::before {
+      content: attr(data-label);
+      position: absolute;
+      left: 10px;
+      top: 8px;
+      width: 36%;
+      font-weight: bold;
+      color: #666;
     }
 
     .badge-ingreso {
@@ -113,14 +157,21 @@
       font-weight: bold;
     }
 
+    .empty-row {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 12px;
+      font-size: 14px;
+    }
+
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.4);
+      background: rgba(0, 0, 0, .4);
       display: none;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
       z-index: 1000;
     }
 
@@ -134,7 +185,7 @@
       background: #fff;
       padding: 16px;
       border: 1px solid #ccc;
-      max-height: 90vh;
+      max-height: 92vh;
       overflow-y: auto;
     }
 
@@ -148,92 +199,92 @@
       font-size: 14px;
     }
 
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-    }
-
     textarea {
       min-height: 70px;
       resize: vertical;
     }
 
     .actions {
-      display: flex;
+      display: grid;
       gap: 8px;
-      justify-content: flex-end;
       margin-top: 12px;
     }
 
-    @media (max-width: 700px) {
+    .hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    @media (min-width: 701px) {
       body {
-        padding: 12px;
+        padding: 16px;
       }
 
       h1 {
-        font-size: 20px;
+        font-size: 22px;
       }
 
       .filters {
-        grid-template-columns: 1fr;
+        grid-template-columns: 140px 1fr 180px 180px 180px;
+        align-items: end;
       }
 
       .summary {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .actions {
-        flex-direction: column;
+        display: flex;
+        justify-content: flex-end;
       }
 
       .table-wrap {
-        overflow: visible;
-        background: transparent;
-        border: none;
-      }
-
-      table, tbody, tr, td {
-        display: block;
-        width: 100%;
+        overflow-x: auto;
+        background: #fff;
+        border: 1px solid #ddd;
       }
 
       table {
-        min-width: 100%;
+        width: 100%;
+        min-width: 980px;
+        display: table;
       }
 
       thead {
-        display: none;
+        display: table-header-group;
+      }
+
+      tbody {
+        display: table-row-group;
       }
 
       tr {
-        background: #fff;
-        border: 1px solid #ddd;
-        margin-bottom: 12px;
-        padding: 6px 0;
-      }
-
-      td {
+        display: table-row;
+        background: transparent;
         border: none;
-        border-bottom: 1px solid #f0f0f0;
-        padding: 8px 10px 8px 42%;
-        position: relative;
-        min-height: 20px;
-        word-break: break-word;
+        margin-bottom: 0;
+        padding: 0;
       }
 
-      td:last-child {
-        border-bottom: none;
+      th,
+      td {
+        display: table-cell;
+        width: auto;
+        position: static;
+        padding: 10px;
+        border-bottom: 1px solid #e5e5e5;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #fafafa;
+        font-size: 14px;
       }
 
       td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        top: 8px;
-        width: 36%;
-        font-weight: bold;
-        color: #666;
+        display: none;
       }
     }
   </style>
@@ -241,6 +292,12 @@
 <body>
   <div class="wrap">
     <h1>Registro de Pagos</h1>
+
+    <div class="quick-filters">
+      <button type="button" id="btnHoy">Hoy</button>
+      <button type="button" id="btn7Dias">7 días</button>
+      <button type="button" id="btnTodo">Todo</button>
+    </div>
 
     <div class="filters">
       <div class="filter-item">
@@ -250,9 +307,8 @@
 
       <div class="filter-item">
         <label for="clienteFiltro">Cliente</label>
-        <select id="clienteFiltro">
-          <option value="">Todos los clientes</option>
-        </select>
+        <input id="clienteFiltro" type="text" placeholder="Buscar cliente" list="clientesListFiltro" autocomplete="off">
+        <datalist id="clientesListFiltro"></datalist>
       </div>
 
       <div class="filter-item">
@@ -327,12 +383,14 @@
 
         <div class="form-group">
           <label for="cliente">Cliente</label>
-          <input id="cliente" name="cliente" type="text" required>
+          <input id="cliente" name="cliente" type="text" list="clientesListForm" autocomplete="off" required>
+          <datalist id="clientesListForm"></datalist>
         </div>
 
         <div class="form-group" id="proveedorWrap">
           <label for="proveedor">Proveedor</label>
-          <input id="proveedor" name="proveedor" type="text">
+          <input id="proveedor" name="proveedor" type="text" list="proveedoresListForm" autocomplete="off">
+          <datalist id="proveedoresListForm"></datalist>
         </div>
 
         <div class="form-group">
@@ -353,18 +411,20 @@
 
         <div class="form-group">
           <label for="numeroOperacion">Número de operación</label>
-          <input id="numeroOperacion" name="numeroOperacion" type="text">
+          <input id="numeroOperacion" name="numeroOperacion" type="text" inputmode="numeric">
         </div>
 
         <div class="form-group">
           <label for="monto">Monto</label>
-          <input id="monto" name="monto" type="number" step="0.01" required>
+          <input id="monto" name="monto" type="number" step="0.01" inputmode="decimal" required>
         </div>
 
         <div class="form-group">
           <label for="observacion">Observación</label>
           <textarea id="observacion" name="observacion"></textarea>
         </div>
+
+        <div class="hint">Se recordará el último tipo y banco usados.</div>
 
         <div class="actions">
           <button type="button" id="closeModalBtn">Cerrar</button>
@@ -375,27 +435,64 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbznnKZNXp-0hyW-YA_WKogh_m2JLahppqTYJctsrMju6yCEWYvyfggx77ITTKHVB_wASg/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxvpNxDIAJKY5GQ2JcDacOGg9K3EwJlT9wvNZY00XB0L1q5EiFne_ha8wJDexsLMFHAxg/exec';
+    const STORAGE_LAST_TIPO = 'registroPagos.lastTipo';
+    const STORAGE_LAST_BANCO = 'registroPagos.lastBanco';
 
     const modal = document.getElementById('modal');
     const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
+    const btnHoy = document.getElementById('btnHoy');
+    const btn7Dias = document.getElementById('btn7Dias');
+    const btnTodo = document.getElementById('btnTodo');
+
     const formRegistro = document.getElementById('formRegistro');
     const tablaBody = document.getElementById('tablaBody');
     const statusEl = document.getElementById('status');
+
     const clienteFiltro = document.getElementById('clienteFiltro');
     const tipoFiltro = document.getElementById('tipoFiltro');
     const fechaInicioFiltro = document.getElementById('fechaInicioFiltro');
     const fechaFinFiltro = document.getElementById('fechaFinFiltro');
+
     const tipoSelect = document.getElementById('tipo');
+    const clienteInput = document.getElementById('cliente');
     const proveedorWrap = document.getElementById('proveedorWrap');
     const proveedorInput = document.getElementById('proveedor');
+    const bancoSelect = document.getElementById('banco');
+    const conceptoInput = document.getElementById('concepto');
+
     const totalIngresosEl = document.getElementById('totalIngresos');
     const totalEgresosEl = document.getElementById('totalEgresos');
     const saldoTotalEl = document.getElementById('saldoTotal');
     const saveBtn = document.getElementById('saveBtn');
 
+    const clientesListFiltro = document.getElementById('clientesListFiltro');
+    const clientesListForm = document.getElementById('clientesListForm');
+    const proveedoresListForm = document.getElementById('proveedoresListForm');
+
     let registros = [];
+
+    function normalizeText(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+        .toLowerCase();
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toFixed(2);
+    }
 
     function getTodayLocal() {
       const now = new Date();
@@ -404,31 +501,116 @@
       return local.toISOString().slice(0, 10);
     }
 
+    function addDays(dateString, days) {
+      const date = new Date(dateString + 'T00:00:00');
+      date.setDate(date.getDate() + days);
+      const offset = date.getTimezoneOffset();
+      const local = new Date(date.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
     function setFiltrosHoy() {
       const hoy = getTodayLocal();
       fechaInicioFiltro.value = hoy;
       fechaFinFiltro.value = hoy;
+      updateView();
     }
 
-    function getFechaSolo(fechaTexto) {
-      return String(fechaTexto || '').slice(0, 10);
+    function setFiltros7Dias() {
+      const hoy = getTodayLocal();
+      fechaInicioFiltro.value = addDays(hoy, -6);
+      fechaFinFiltro.value = hoy;
+      updateView();
     }
 
-    function openModal() {
-      modal.classList.add('show');
+    function setFiltrosTodo() {
+      fechaInicioFiltro.value = '';
+      fechaFinFiltro.value = '';
+      updateView();
     }
 
-    function closeModal() {
-      modal.classList.remove('show');
-      formRegistro.reset();
-      tipoSelect.value = 'Ingreso';
-      toggleProveedor();
+    function normalizeRecord(record) {
+      const fecha = String(record.fecha || '');
+      return {
+        fecha,
+        fechaSolo: fecha.slice(0, 10),
+        tipo: String(record.tipo || '').trim(),
+        cliente: String(record.cliente || '').trim(),
+        proveedor: String(record.proveedor || '').trim(),
+        banco: String(record.banco || '').trim(),
+        concepto: String(record.concepto || '').trim(),
+        numeroOperacion: String(record.numeroOperacion || '').trim(),
+        monto: Number(record.monto || 0),
+        observacion: String(record.observacion || '').trim()
+      };
+    }
+
+    function uniqueSorted(values) {
+      const map = new Map();
+
+      values.forEach(value => {
+        const clean = String(value || '').trim();
+        if (!clean) return;
+        const key = normalizeText(clean);
+        if (!map.has(key)) {
+          map.set(key, clean);
+        }
+      });
+
+      return Array.from(map.values()).sort((a, b) => a.localeCompare(b, 'es'));
+    }
+
+    function renderDatalist(datalistEl, values) {
+      datalistEl.innerHTML = values.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
+    }
+
+    function updateCatalogs() {
+      const clientes = uniqueSorted(registros.map(r => r.cliente));
+      const proveedores = uniqueSorted(registros.map(r => r.proveedor));
+
+      renderDatalist(clientesListFiltro, clientes);
+      renderDatalist(clientesListForm, clientes);
+      renderDatalist(proveedoresListForm, proveedores);
     }
 
     function toggleProveedor() {
       const esEgreso = tipoSelect.value === 'Egreso';
       proveedorWrap.style.display = esEgreso ? 'block' : 'none';
-      if (!esEgreso) proveedorInput.value = '';
+      if (!esEgreso) {
+        proveedorInput.value = '';
+      }
+    }
+
+    function savePreferences() {
+      localStorage.setItem(STORAGE_LAST_TIPO, tipoSelect.value || 'Ingreso');
+      localStorage.setItem(STORAGE_LAST_BANCO, bancoSelect.value || '');
+    }
+
+    function loadPreferences() {
+      const lastTipo = localStorage.getItem(STORAGE_LAST_TIPO);
+      const lastBanco = localStorage.getItem(STORAGE_LAST_BANCO);
+
+      if (lastTipo) {
+        tipoSelect.value = lastTipo;
+      }
+
+      if (lastBanco) {
+        bancoSelect.value = lastBanco;
+      }
+
+      toggleProveedor();
+    }
+
+    function openModal() {
+      modal.classList.add('show');
+      loadPreferences();
+      setTimeout(() => clienteInput.focus(), 50);
+    }
+
+    function closeModal() {
+      modal.classList.remove('show');
+      formRegistro.reset();
+      loadPreferences();
     }
 
     function getRangoFechas() {
@@ -445,95 +627,64 @@
     }
 
     function getFilteredData() {
-      const cliente = clienteFiltro.value;
+      const clienteBuscado = normalizeText(clienteFiltro.value);
       const tipo = tipoFiltro.value;
       const { inicio, fin } = getRangoFechas();
 
       return registros.filter(r => {
-        const fechaRegistro = getFechaSolo(r.fecha);
-        const okCliente = !cliente || r.cliente === cliente;
+        const okCliente = !clienteBuscado || normalizeText(r.cliente).includes(clienteBuscado);
         const okTipo = !tipo || r.tipo === tipo;
-        const okInicio = !inicio || fechaRegistro >= inicio;
-        const okFin = !fin || fechaRegistro <= fin;
-
+        const okInicio = !inicio || r.fechaSolo >= inicio;
+        const okFin = !fin || r.fechaSolo <= fin;
         return okCliente && okTipo && okInicio && okFin;
       });
     }
 
-    function renderFiltroClientes() {
-      const clientes = [...new Set(registros.map(r => (r.cliente || '').trim()).filter(Boolean))]
-        .sort((a, b) => a.localeCompare(b, 'es'));
-
-      const actual = clienteFiltro.value;
-      clienteFiltro.innerHTML = '<option value="">Todos los clientes</option>';
-
-      clientes.forEach(cliente => {
-        const option = document.createElement('option');
-        option.value = cliente;
-        option.textContent = cliente;
-        clienteFiltro.appendChild(option);
-      });
-
-      clienteFiltro.value = clientes.includes(actual) ? actual : '';
-    }
-
-    function renderResumen() {
-      const data = getFilteredData();
-
+    function renderResumen(data) {
       const totalIngresos = data
         .filter(r => r.tipo === 'Ingreso')
-        .reduce((acc, r) => acc + Number(r.monto || 0), 0);
+        .reduce((acc, r) => acc + r.monto, 0);
 
       const totalEgresos = data
         .filter(r => r.tipo === 'Egreso')
-        .reduce((acc, r) => acc + Number(r.monto || 0), 0);
+        .reduce((acc, r) => acc + r.monto, 0);
 
-      const saldo = totalIngresos - totalEgresos;
-
-      totalIngresosEl.textContent = totalIngresos.toFixed(2);
-      totalEgresosEl.textContent = totalEgresos.toFixed(2);
-      saldoTotalEl.textContent = saldo.toFixed(2);
+      totalIngresosEl.textContent = formatMoney(totalIngresos);
+      totalEgresosEl.textContent = formatMoney(totalEgresos);
+      saldoTotalEl.textContent = formatMoney(totalIngresos - totalEgresos);
     }
 
-    function renderTabla() {
-      const data = getFilteredData();
-
-      tablaBody.innerHTML = '';
-
-      if (data.length === 0) {
-        tablaBody.innerHTML = '<tr><td colspan="9">No hay registros</td></tr>';
-        renderResumen();
+    function renderTabla(data) {
+      if (!data.length) {
+        tablaBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty-row">No hay registros</td>
+          </tr>
+        `;
         return;
       }
 
-      data.forEach(r => {
-        const tr = document.createElement('tr');
+      const html = data.map(r => `
+        <tr>
+          <td data-label="Fecha">${escapeHtml(r.fecha)}</td>
+          <td data-label="Tipo" class="${r.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(r.tipo)}</td>
+          <td data-label="Cliente">${escapeHtml(r.cliente)}</td>
+          <td data-label="Proveedor">${escapeHtml(r.proveedor)}</td>
+          <td data-label="Banco">${escapeHtml(r.banco)}</td>
+          <td data-label="Concepto">${escapeHtml(r.concepto)}</td>
+          <td data-label="N° Operación">${escapeHtml(r.numeroOperacion)}</td>
+          <td data-label="Monto">${formatMoney(r.monto)}</td>
+          <td data-label="Observación">${escapeHtml(r.observacion)}</td>
+        </tr>
+      `).join('');
 
-        tr.innerHTML = `
-          <td data-label="Fecha">${escapeHtml(r.fecha || '')}</td>
-          <td data-label="Tipo" class="${r.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(r.tipo || '')}</td>
-          <td data-label="Cliente">${escapeHtml(r.cliente || '')}</td>
-          <td data-label="Proveedor">${escapeHtml(r.proveedor || '')}</td>
-          <td data-label="Banco">${escapeHtml(r.banco || '')}</td>
-          <td data-label="Concepto">${escapeHtml(r.concepto || '')}</td>
-          <td data-label="N° Operación">${escapeHtml(r.numeroOperacion || '')}</td>
-          <td data-label="Monto">${Number(r.monto || 0).toFixed(2)}</td>
-          <td data-label="Observación">${escapeHtml(r.observacion || '')}</td>
-        `;
-
-        tablaBody.appendChild(tr);
-      });
-
-      renderResumen();
+      tablaBody.innerHTML = html;
     }
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+    function updateView() {
+      const data = getFilteredData();
+      renderTabla(data);
+      renderResumen(data);
     }
 
     async function cargarDatos() {
@@ -543,9 +694,13 @@
         const res = await fetch(API_URL);
         const json = await res.json();
 
-        registros = (json.data || []).slice().reverse();
-        renderFiltroClientes();
-        renderTabla();
+        if (!json.ok) {
+          throw new Error(json.error || 'No se pudo cargar');
+        }
+
+        registros = (json.data || []).map(normalizeRecord).reverse();
+        updateCatalogs();
+        updateView();
         statusEl.textContent = '';
       } catch (error) {
         console.error(error);
@@ -575,8 +730,17 @@
           return;
         }
 
+        savePreferences();
+
+        if (json.record) {
+          registros.unshift(normalizeRecord(json.record));
+          updateCatalogs();
+          updateView();
+        } else {
+          await cargarDatos();
+        }
+
         closeModal();
-        await cargarDatos();
       } catch (error) {
         console.error(error);
         alert('Error al guardar');
@@ -586,20 +750,33 @@
       }
     });
 
+    tipoSelect.addEventListener('change', () => {
+      toggleProveedor();
+      savePreferences();
+    });
+
+    bancoSelect.addEventListener('change', savePreferences);
+
     openModalBtn.addEventListener('click', openModal);
     closeModalBtn.addEventListener('click', closeModal);
-    clienteFiltro.addEventListener('change', renderTabla);
-    tipoFiltro.addEventListener('change', renderTabla);
-    fechaInicioFiltro.addEventListener('change', renderTabla);
-    fechaFinFiltro.addEventListener('change', renderTabla);
-    tipoSelect.addEventListener('change', toggleProveedor);
+
+    btnHoy.addEventListener('click', setFiltrosHoy);
+    btn7Dias.addEventListener('click', setFiltros7Dias);
+    btnTodo.addEventListener('click', setFiltrosTodo);
+
+    clienteFiltro.addEventListener('input', updateView);
+    tipoFiltro.addEventListener('change', updateView);
+    fechaInicioFiltro.addEventListener('change', updateView);
+    fechaFinFiltro.addEventListener('change', updateView);
 
     modal.addEventListener('click', function (e) {
-      if (e.target === modal) closeModal();
+      if (e.target === modal) {
+        closeModal();
+      }
     });
 
     setFiltrosHoy();
-    toggleProveedor();
+    loadPreferences();
     cargarDatos();
   </script>
 </body>
