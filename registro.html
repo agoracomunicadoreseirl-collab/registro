@@ -514,7 +514,7 @@
       }
 
       .actions-grid {
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(7, 1fr);
       }
 
      .filters-grid {
@@ -689,13 +689,14 @@
 
     <div class="panel">
       <div class="actions-grid">
-        <button type="button" id="btnNuevoTrabajo" class="btn btn-primary">+ Nuevo trabajo</button>
-        <button type="button" id="btnNuevoMovimiento" class="btn btn-success">+ Movimiento</button>
-        <button type="button" id="btnNuevoReparto" class="btn btn-secondary">+ Reparto</button>
-        <button type="button" id="btnHoy" class="btn btn-soft">Hoy</button>
-        <button type="button" id="btn7Dias" class="btn btn-soft">7 días</button>
-        <button type="button" id="btnTodo" class="btn btn-soft">Todo</button>
-      </div>
+  <button type="button" id="btnNuevoTrabajo" class="btn btn-primary">+ Nuevo trabajo</button>
+  <button type="button" id="btnNuevoMovimiento" class="btn btn-success">+ Movimiento</button>
+  <button type="button" id="btnNuevoBanco" class="btn btn-secondary">+ Banco</button>
+  <button type="button" id="btnNuevoReparto" class="btn btn-secondary">+ Reparto</button>
+  <button type="button" id="btnHoy" class="btn btn-soft">Hoy</button>
+  <button type="button" id="btn7Dias" class="btn btn-soft">7 días</button>
+  <button type="button" id="btnTodo" class="btn btn-soft">Todo</button>
+</div>
 
       <div class="filters-grid">
         <div class="field">
@@ -753,6 +754,9 @@
     </div>
     </div>
 
+    <datalist id="operacionesBancoList"></datalist>
+    <datalist id="proveedoresList"></datalist>
+    
     <div class="status" id="status">Cargando...</div>
 
     <div class="summary-grid">
@@ -968,12 +972,12 @@
 
         <div class="form-group" id="movProveedorWrap">
           <label for="movProveedor">Proveedor</label>
-          <input id="movProveedor" name="proveedor">
+          <input id="movProveedor" name="proveedor" list="proveedoresList" autocomplete="off">
         </div>
-
+        
         <div class="form-group">
           <label for="movBanco">Banco</label>
-          <select id="movBanco" name="banco" required>
+          <select id="movBanco" name="banco">
             <option value="">Seleccionar</option>
             <option value="YAPE">YAPE</option>
             <option value="BBVA">BBVA</option>
@@ -981,20 +985,28 @@
             <option value="BCP">BCP</option>
           </select>
         </div>
-
+        
         <div class="form-group">
           <label for="movConcepto">Concepto</label>
           <input id="movConcepto" name="concepto" required>
         </div>
-
+        
         <div class="form-group">
           <label for="movNumeroOperacion">Número de operación</label>
-          <input id="movNumeroOperacion" name="numeroOperacion" inputmode="numeric">
+          <input
+            id="movNumeroOperacion"
+            name="numeroOperacion"
+            inputmode="numeric"
+            list="operacionesBancoList"
+            autocomplete="off"
+          >
+          <div class="hint">Si la operación existe, se autocompletan tipo, banco, monto y observación.</div>
         </div>
-
+        
         <div class="form-group">
           <label for="movMonto">Monto</label>
-          <input id="movMonto" name="monto" type="number" step="0.01" min="0.01" inputmode="decimal" required>
+          <input id="movMonto" name="monto" type="number" step="0.01" min="0.01" inputmode="decimal">
+          <div class="hint">Si lo dejas vacío y existe la operación, se usa el monto registrado en banco.</div>
         </div>
 
         <div class="form-group">
@@ -1009,8 +1021,56 @@
       </form>
     </div>
   </div>
+  <!-- MODAL BANCO -->
+<div class="modal" id="modalBanco">
+  <div class="modal-box">
+    <h2 class="modal-title">Nuevo movimiento bancario</h2>
+    <p class="modal-subtitle">Registra primero la operación del banco y luego la podrás asociar a trabajos por número de operación.</p>
 
-  <!-- MODAL REPARTO -->
+    <form id="formBanco">
+      <div class="form-group">
+        <label for="bancoTipo">Tipo</label>
+        <select id="bancoTipo" name="tipo" required>
+          <option value="Ingreso">Ingreso</option>
+          <option value="Egreso">Egreso</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="bancoBanco">Banco</label>
+        <select id="bancoBanco" name="banco" required>
+          <option value="">Seleccionar</option>
+          <option value="YAPE">YAPE</option>
+          <option value="BBVA">BBVA</option>
+          <option value="INTERBANK">INTERBANK</option>
+          <option value="BCP">BCP</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="bancoNumeroOperacion">Número de operación</label>
+        <input id="bancoNumeroOperacion" name="numeroOperacion" inputmode="numeric" required>
+      </div>
+
+      <div class="form-group">
+        <label for="bancoMonto">Monto</label>
+        <input id="bancoMonto" name="monto" type="number" step="0.01" min="0.01" inputmode="decimal" required>
+      </div>
+
+      <div class="form-group">
+        <label for="bancoObservacion">Observación</label>
+        <textarea id="bancoObservacion" name="observacion"></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="cerrarBanco" class="btn btn-secondary">Cerrar</button>
+        <button type="submit" id="guardarBanco" class="btn btn-primary">Guardar banco</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL REPARTO -->
   <div class="modal" id="modalReparto">
     <div class="modal-box">
       <h2 class="modal-title">Nuevo reparto</h2>
@@ -1043,7 +1103,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwtjRIKeRmuwlJjXgmADKg3nTpTtdQCr3c9tY8uraGzLQaGPY9sZ3j7MV7vZiSsjzFYOQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzNcfKijGV2OxzMbygn-8uxbh4CrUWITZTSi4ycnqdE_2oCweAOy6sBXUtiZaIt_YHaog/exec';
     const STORAGE_LAST_TIPO = 'trabajos.lastTipo';
     const STORAGE_LAST_BANCO = 'trabajos.lastBanco';
 
@@ -1051,6 +1111,7 @@
 
     const btnNuevoTrabajo = document.getElementById('btnNuevoTrabajo');
     const btnNuevoMovimiento = document.getElementById('btnNuevoMovimiento');
+    const btnNuevoBanco = document.getElementById('btnNuevoBanco');
     const btnNuevoReparto = document.getElementById('btnNuevoReparto');
 
     const btnHoy = document.getElementById('btnHoy');
@@ -1081,20 +1142,24 @@
     const cardCantidad = document.getElementById('cardCantidad');
     const cardPrecioUnitario = document.getElementById('cardPrecioUnitario');
 
-    const modalTrabajo = document.getElementById('modalTrabajo');
+   const modalTrabajo = document.getElementById('modalTrabajo');
     const modalMovimiento = document.getElementById('modalMovimiento');
+    const modalBanco = document.getElementById('modalBanco');
     const modalReparto = document.getElementById('modalReparto');
 
     const formTrabajo = document.getElementById('formTrabajo');
     const formMovimiento = document.getElementById('formMovimiento');
+    const formBanco = document.getElementById('formBanco');
     const formReparto = document.getElementById('formReparto');
 
     const cerrarTrabajo = document.getElementById('cerrarTrabajo');
     const cerrarMovimiento = document.getElementById('cerrarMovimiento');
+    const cerrarBanco = document.getElementById('cerrarBanco');
     const cerrarReparto = document.getElementById('cerrarReparto');
 
     const guardarTrabajo = document.getElementById('guardarTrabajo');
     const guardarMovimiento = document.getElementById('guardarMovimiento');
+    const guardarBanco = document.getElementById('guardarBanco');
     const guardarReparto = document.getElementById('guardarReparto');
 
     const movTrabajoId = document.getElementById('movTrabajoId');
@@ -1103,11 +1168,20 @@
     const movProveedorWrap = document.getElementById('movProveedorWrap');
     const movProveedor = document.getElementById('movProveedor');
     const movBanco = document.getElementById('movBanco');
-
+    const movConcepto = document.getElementById('movConcepto');
+    const movNumeroOperacion = document.getElementById('movNumeroOperacion');
+    const movMonto = document.getElementById('movMonto');
+    const movObservacion = document.getElementById('movObservacion');
+    
+    const operacionesBancoList = document.getElementById('operacionesBancoList');
+    const proveedoresList = document.getElementById('proveedoresList');
+    
     const repTrabajoId = document.getElementById('repTrabajoId');
 
     let trabajos = [];
     let detalleTrabajo = null;
+    let bancoMovimientosCatalogo = [];
+    let proveedoresCatalogo = [];
 
     function escapeHtml(value) {
       return String(value || '')
@@ -1217,6 +1291,56 @@
     function syncMovimientoCliente() {
       const trabajo = getTrabajoById(movTrabajoId.value);
       movClienteDisplay.value = trabajo ? trabajo.cliente : '';
+    }
+    
+    function renderCatalogos() {
+      operacionesBancoList.innerHTML = bancoMovimientosCatalogo
+        .map(item => `<option value="${escapeHtml(item.numeroOperacion)}"></option>`)
+        .join('');
+    
+      proveedoresList.innerHTML = proveedoresCatalogo
+        .map(item => `<option value="${escapeHtml(item.nombre)}"></option>`)
+        .join('');
+    }
+    
+    function findBancoMovimientoCatalogoByOperacion(numeroOperacion) {
+      const target = String(numeroOperacion || '').trim();
+      if (!target) return null;
+    
+      return bancoMovimientosCatalogo.find(item =>
+        String(item.numeroOperacion || '').trim() === target
+      ) || null;
+    }
+    
+    function autofillMovimientoDesdeOperacion() {
+      const numeroOperacion = String(movNumeroOperacion.value || '').trim();
+      if (!numeroOperacion) return;
+    
+      const bancoMovimiento = findBancoMovimientoCatalogoByOperacion(numeroOperacion);
+      if (!bancoMovimiento) return;
+    
+      movTipo.value = bancoMovimiento.tipo || movTipo.value;
+      toggleProveedor();
+    
+      movBanco.value = bancoMovimiento.banco || '';
+      movMonto.value = Number(bancoMovimiento.monto || 0);
+      movObservacion.value = bancoMovimiento.observacion || '';
+    }
+    
+    async function loadCatalogos() {
+      try {
+        const json = await apiGet('listCatalogos');
+    
+        if (!json.ok) {
+          throw new Error(json.error || 'No se pudo cargar catálogos');
+        }
+    
+        bancoMovimientosCatalogo = json.data?.bancoMovimientos || [];
+        proveedoresCatalogo = json.data?.proveedores || [];
+        renderCatalogos();
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     function setFiltrosHoy() {
@@ -1489,9 +1613,11 @@
 
     formMovimiento.addEventListener('submit', async function (e) {
       e.preventDefault();
+      autofillMovimientoDesdeOperacion();
+    
       guardarMovimiento.disabled = true;
       guardarMovimiento.textContent = 'Guardando...';
-
+    
       try {
         const formData = new FormData(formMovimiento);
         const json = await apiPost('createMovimiento', Object.fromEntries(formData.entries()));
@@ -1505,6 +1631,7 @@
         closeModal(modalMovimiento, formMovimiento);
         loadPreferences();
         syncTrabajoInForms();
+        await loadCatalogos();
         await loadDetalleTrabajo(trabajoFiltro.value);
 
       } catch (error) {
@@ -1516,7 +1643,32 @@
       }
     });
 
-    formReparto.addEventListener('submit', async function (e) {
+    formBanco.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  guardarBanco.disabled = true;
+  guardarBanco.textContent = 'Guardando...';
+
+  try {
+    const formData = new FormData(formBanco);
+    const json = await apiPost('createBancoMovimiento', Object.fromEntries(formData.entries()));
+
+    if (!json.ok) {
+      alert(json.error || 'No se pudo guardar el movimiento bancario');
+      return;
+    }
+
+    closeModal(modalBanco, formBanco);
+    await loadCatalogos();
+  } catch (error) {
+    console.error(error);
+    alert('Error al guardar movimiento bancario');
+  } finally {
+    guardarBanco.disabled = false;
+    guardarBanco.textContent = 'Guardar banco';
+  }
+});
+
+formReparto.addEventListener('submit', async function (e) {
       e.preventDefault();
       guardarReparto.disabled = true;
       guardarReparto.textContent = 'Guardando...';
@@ -1548,13 +1700,15 @@
       loadPreferences();
       openModal(modalMovimiento);
     });
+    btnNuevoBanco.addEventListener('click', () => openModal(modalBanco));
     btnNuevoReparto.addEventListener('click', () => {
       syncTrabajoInForms();
       openModal(modalReparto);
     });
-
+    
     cerrarTrabajo.addEventListener('click', () => closeModal(modalTrabajo, formTrabajo));
     cerrarMovimiento.addEventListener('click', () => closeModal(modalMovimiento, formMovimiento));
+    cerrarBanco.addEventListener('click', () => closeModal(modalBanco, formBanco));
     cerrarReparto.addEventListener('click', () => closeModal(modalReparto, formReparto));
 
     movTipo.addEventListener('change', () => {
@@ -1564,6 +1718,8 @@
 
     movBanco.addEventListener('change', savePreferences);
     movTrabajoId.addEventListener('change', syncMovimientoCliente);
+    movNumeroOperacion.addEventListener('change', autofillMovimientoDesdeOperacion);
+    movNumeroOperacion.addEventListener('blur', autofillMovimientoDesdeOperacion);
 
     trabajoFiltro.addEventListener('change', async () => {
       syncTrabajoInForms();
@@ -1580,7 +1736,7 @@
     btnTodo.addEventListener('click', setFiltrosTodo);
     btnActualizarEstado.addEventListener('click', updateEstadoTrabajo);
 
-    [modalTrabajo, modalMovimiento, modalReparto].forEach(modal => {
+     [modalTrabajo, modalMovimiento, modalBanco, modalReparto].forEach(modal => {
       modal.addEventListener('click', function (e) {
         if (e.target === modal) {
           modal.classList.remove('show');
@@ -1590,6 +1746,7 @@
 
     loadPreferences();
     setFiltrosHoy();
+    loadCatalogos();
     loadTrabajos();
   </script>
 </body>
