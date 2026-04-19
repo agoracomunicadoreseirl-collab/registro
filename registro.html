@@ -3,11 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Registro de Pagos</title>
+  <title>Control de Trabajos</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: Arial, sans-serif;
@@ -18,79 +16,73 @@
     }
 
     .wrap {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
-    h1 {
-      font-size: 20px;
+    h1, h2 {
       margin: 0 0 12px;
     }
 
-    .filters,
-    .quick-filters,
-    .summary {
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; }
+
+    button, input, select, textarea {
+      width: 100%;
+      font-size: 16px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    button { cursor: pointer; }
+
+    .grid, .actions-grid, .summary-grid, .section-grid {
       display: grid;
       gap: 8px;
       margin-bottom: 12px;
     }
 
-    .filters {
-      grid-template-columns: 1fr;
-    }
-
-    .quick-filters {
+    .actions-grid {
       grid-template-columns: repeat(3, 1fr);
     }
 
-    .summary {
+    .grid {
       grid-template-columns: 1fr;
     }
 
-    .filter-item label {
-      display: block;
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 4px;
+    .summary-grid {
+      grid-template-columns: 1fr;
     }
 
-    button,
-    input,
-    select,
-    textarea {
-      font-size: 16px;
-      padding: 10px;
-      width: 100%;
-      border: 1px solid #ccc;
+    .section {
       background: #fff;
-      border-radius: 0;
+      border: 1px solid #ddd;
+      padding: 12px;
+      margin-bottom: 12px;
     }
 
-    button {
-      cursor: pointer;
-    }
-
-    .box {
+    .card {
       background: #fff;
       border: 1px solid #ddd;
       padding: 12px;
     }
 
-    .box-title {
+    .card-title {
       font-size: 13px;
       color: #666;
       margin-bottom: 6px;
     }
 
-    .box-value {
-      font-size: 22px;
+    .card-value {
+      font-size: 20px;
       font-weight: bold;
     }
 
     .status {
       font-size: 14px;
       color: #555;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
     .table-wrap {
@@ -99,10 +91,7 @@
       border: none;
     }
 
-    table,
-    tbody,
-    tr,
-    td {
+    table, tbody, tr, td {
       display: block;
       width: 100%;
     }
@@ -123,6 +112,10 @@
       padding: 6px 0;
     }
 
+    th, td {
+      font-size: 14px;
+    }
+
     td {
       border: none;
       border-bottom: 1px solid #f0f0f0;
@@ -130,7 +123,6 @@
       position: relative;
       min-height: 20px;
       word-break: break-word;
-      font-size: 14px;
     }
 
     td:last-child {
@@ -157,36 +149,11 @@
       font-weight: bold;
     }
 
-    .empty-row {
+    .empty {
       background: #fff;
       border: 1px solid #ddd;
       padding: 12px;
       font-size: 14px;
-    }
-
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, .4);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      z-index: 1000;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-box {
-      width: 100%;
-      max-width: 460px;
-      background: #fff;
-      padding: 16px;
-      border: 1px solid #ccc;
-      max-height: 92vh;
-      overflow-y: auto;
     }
 
     .form-group {
@@ -216,22 +183,45 @@
       margin-top: 4px;
     }
 
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      z-index: 1000;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      padding: 16px;
+      border: 1px solid #ccc;
+      max-height: 92vh;
+      overflow-y: auto;
+    }
+
     @media (min-width: 701px) {
-      body {
-        padding: 16px;
+      body { padding: 16px; }
+
+      .actions-grid {
+        grid-template-columns: repeat(6, 1fr);
       }
 
-      h1 {
-        font-size: 22px;
-      }
-
-      .filters {
-        grid-template-columns: 140px 1fr 180px 180px 180px;
+      .grid {
+        grid-template-columns: 1.3fr 1fr 1fr 1fr;
         align-items: end;
       }
 
-      .summary {
-        grid-template-columns: repeat(3, 1fr);
+      .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
       }
 
       .actions {
@@ -247,7 +237,7 @@
 
       table {
         width: 100%;
-        min-width: 980px;
+        min-width: 900px;
         display: table;
       }
 
@@ -267,8 +257,7 @@
         padding: 0;
       }
 
-      th,
-      td {
+      th, td {
         display: table-cell;
         width: auto;
         position: static;
@@ -280,7 +269,6 @@
 
       th {
         background: #fafafa;
-        font-size: 14px;
       }
 
       td::before {
@@ -291,111 +279,236 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Registro de Pagos</h1>
+    <h1>Control de Trabajos</h1>
 
-    <div class="quick-filters">
+    <div class="actions-grid">
+      <button type="button" id="btnNuevoTrabajo">Nuevo trabajo</button>
+      <button type="button" id="btnNuevoMovimiento">Nuevo movimiento</button>
+      <button type="button" id="btnNuevoReparto">Nuevo reparto</button>
       <button type="button" id="btnHoy">Hoy</button>
       <button type="button" id="btn7Dias">7 días</button>
       <button type="button" id="btnTodo">Todo</button>
     </div>
 
-    <div class="filters">
-      <div class="filter-item">
-        <label>&nbsp;</label>
-        <button id="openModalBtn" type="button">Agregar</button>
+    <div class="grid">
+      <div class="form-group">
+        <label for="trabajoFiltro">Trabajo</label>
+        <select id="trabajoFiltro"></select>
       </div>
 
-      <div class="filter-item">
-        <label for="clienteFiltro">Cliente</label>
-        <input id="clienteFiltro" type="text" placeholder="Buscar cliente" list="clientesListFiltro" autocomplete="off">
-        <datalist id="clientesListFiltro"></datalist>
-      </div>
-
-      <div class="filter-item">
+      <div class="form-group">
         <label for="tipoFiltro">Tipo</label>
         <select id="tipoFiltro">
-          <option value="">Todos los tipos</option>
+          <option value="">Todos</option>
           <option value="Ingreso">Ingreso</option>
           <option value="Egreso">Egreso</option>
         </select>
       </div>
 
-      <div class="filter-item">
+      <div class="form-group">
         <label for="fechaInicioFiltro">Fecha inicio</label>
         <input id="fechaInicioFiltro" type="date">
       </div>
 
-      <div class="filter-item">
+      <div class="form-group">
         <label for="fechaFinFiltro">Fecha fin</label>
         <input id="fechaFinFiltro" type="date">
       </div>
     </div>
 
-    <div class="summary">
-      <div class="box">
-        <div class="box-title">Total ingresos</div>
-        <div class="box-value" id="totalIngresos">0.00</div>
+    <div class="status" id="status">Cargando...</div>
+
+    <div class="summary-grid">
+      <div class="card">
+        <div class="card-title">Cliente</div>
+        <div class="card-value" id="cardCliente">-</div>
       </div>
-      <div class="box">
-        <div class="box-title">Total egresos</div>
-        <div class="box-value" id="totalEgresos">0.00</div>
+      <div class="card">
+        <div class="card-title">Producto</div>
+        <div class="card-value" id="cardProducto">-</div>
       </div>
-      <div class="box">
-        <div class="box-title">Saldo</div>
-        <div class="box-value" id="saldoTotal">0.00</div>
+      <div class="card">
+        <div class="card-title">Total venta</div>
+        <div class="card-value" id="cardVenta">0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Costo real</div>
+        <div class="card-value" id="cardCosto">0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Total cobrado</div>
+        <div class="card-value" id="cardCobrado">0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Utilidad esperada</div>
+        <div class="card-value" id="cardUtilidadEsperada">0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Utilidad cobrada</div>
+        <div class="card-value" id="cardUtilidadCobrada">0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-title">IGV</div>
+        <div class="card-value" id="cardIgv">0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Incluye IGV</div>
+        <div class="card-value" id="cardIncluyeIgv">-</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Estado</div>
+        <div class="card-value" id="cardEstado">-</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cantidad</div>
+        <div class="card-value" id="cardCantidad">0</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Precio unitario</div>
+        <div class="card-value" id="cardPrecioUnitario">0.00</div>
       </div>
     </div>
 
-    <div class="status" id="status">Cargando...</div>
+    <div class="section">
+      <h2>Movimientos del trabajo</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Categoría</th>
+              <th>Proveedor</th>
+              <th>Banco</th>
+              <th>Concepto</th>
+              <th>N° Operación</th>
+              <th>Monto</th>
+              <th>Observación</th>
+            </tr>
+          </thead>
+          <tbody id="tablaMovimientos"></tbody>
+        </table>
+      </div>
+    </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Tipo</th>
-            <th>Cliente</th>
-            <th>Proveedor</th>
-            <th>Banco</th>
-            <th>Concepto</th>
-            <th>N° Operación</th>
-            <th>Monto</th>
-            <th>Observación</th>
-          </tr>
-        </thead>
-        <tbody id="tablaBody"></tbody>
-      </table>
+    <div class="section">
+      <h2>Reparto de utilidad</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Persona</th>
+              <th>%</th>
+              <th>Utilidad esperada</th>
+              <th>Utilidad cobrada</th>
+            </tr>
+          </thead>
+          <tbody id="tablaRepartos"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <div class="modal" id="modal">
+  <!-- MODAL TRABAJO -->
+  <div class="modal" id="modalTrabajo">
     <div class="modal-box">
-      <h2 style="margin-top:0;font-size:18px;">Nuevo registro</h2>
-
-      <form id="formRegistro">
+      <h2>Nuevo trabajo</h2>
+      <form id="formTrabajo">
         <div class="form-group">
-          <label for="tipo">Tipo</label>
-          <select id="tipo" name="tipo" required>
+          <label for="trabajoCliente">Cliente</label>
+          <input id="trabajoCliente" name="cliente" required>
+        </div>
+
+        <div class="form-group">
+          <label for="trabajoProductoVenta">Producto venta</label>
+          <input id="trabajoProductoVenta" name="productoVenta" required>
+        </div>
+
+        <div class="form-group">
+          <label for="trabajoDescripcion">Descripción</label>
+          <textarea id="trabajoDescripcion" name="descripcion"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="trabajoCantidad">Cantidad</label>
+          <input id="trabajoCantidad" name="cantidad" type="number" step="1" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label for="trabajoPrecioUnitarioVenta">Precio unitario venta</label>
+          <input id="trabajoPrecioUnitarioVenta" name="precioUnitarioVenta" type="number" step="0.01" min="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="trabajoIncluyeIGV">¿Incluye IGV?</label>
+          <select id="trabajoIncluyeIGV" name="incluyeIGV" required>
+            <option value="SI">SI</option>
+            <option value="NO">NO</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="trabajoEstado">Estado</label>
+          <select id="trabajoEstado" name="estado" required>
+            <option value="En proceso">En proceso</option>
+            <option value="Terminado">Terminado</option>
+            <option value="Entregado">Entregado</option>
+            <option value="Pagado">Pagado</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="cerrarTrabajo">Cerrar</button>
+          <button type="submit" id="guardarTrabajo">Guardar trabajo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL MOVIMIENTO -->
+  <div class="modal" id="modalMovimiento">
+    <div class="modal-box">
+      <h2>Nuevo movimiento</h2>
+      <form id="formMovimiento">
+        <div class="form-group">
+          <label for="movTrabajoId">Trabajo</label>
+          <select id="movTrabajoId" name="trabajoId" required></select>
+        </div>
+
+        <div class="form-group">
+          <label>Cliente</label>
+          <input id="movClienteDisplay" readonly>
+        </div>
+
+        <div class="form-group">
+          <label for="movTipo">Tipo</label>
+          <select id="movTipo" name="tipo" required>
             <option value="Ingreso">Ingreso</option>
             <option value="Egreso">Egreso</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="cliente">Cliente</label>
-          <input id="cliente" name="cliente" type="text" list="clientesListForm" autocomplete="off" required>
-          <datalist id="clientesListForm"></datalist>
+          <label for="movCategoria">Categoría</label>
+          <select id="movCategoria" name="categoria" required>
+            <option value="">Seleccionar</option>
+            <option value="Material">Material</option>
+            <option value="Proceso">Proceso</option>
+            <option value="Cobro">Cobro</option>
+            <option value="Adelanto">Adelanto</option>
+            <option value="Saldo">Saldo</option>
+            <option value="Otro">Otro</option>
+          </select>
         </div>
 
-        <div class="form-group" id="proveedorWrap">
-          <label for="proveedor">Proveedor</label>
-          <input id="proveedor" name="proveedor" type="text" list="proveedoresListForm" autocomplete="off">
-          <datalist id="proveedoresListForm"></datalist>
+        <div class="form-group" id="movProveedorWrap">
+          <label for="movProveedor">Proveedor</label>
+          <input id="movProveedor" name="proveedor">
         </div>
 
         <div class="form-group">
-          <label for="banco">Banco</label>
-          <select id="banco" name="banco" required>
+          <label for="movBanco">Banco</label>
+          <select id="movBanco" name="banco" required>
             <option value="">Seleccionar</option>
             <option value="YAPE">YAPE</option>
             <option value="BBVA">BBVA</option>
@@ -405,81 +518,126 @@
         </div>
 
         <div class="form-group">
-          <label for="concepto">Concepto</label>
-          <input id="concepto" name="concepto" type="text" required>
+          <label for="movConcepto">Concepto</label>
+          <input id="movConcepto" name="concepto" required>
         </div>
 
         <div class="form-group">
-          <label for="numeroOperacion">Número de operación</label>
-          <input id="numeroOperacion" name="numeroOperacion" type="text" inputmode="numeric">
+          <label for="movNumeroOperacion">Número de operación</label>
+          <input id="movNumeroOperacion" name="numeroOperacion" inputmode="numeric">
         </div>
 
         <div class="form-group">
-          <label for="monto">Monto</label>
-          <input id="monto" name="monto" type="number" step="0.01" inputmode="decimal" required>
+          <label for="movMonto">Monto</label>
+          <input id="movMonto" name="monto" type="number" step="0.01" min="0.01" inputmode="decimal" required>
         </div>
 
         <div class="form-group">
-          <label for="observacion">Observación</label>
-          <textarea id="observacion" name="observacion"></textarea>
+          <label for="movObservacion">Observación</label>
+          <textarea id="movObservacion" name="observacion"></textarea>
         </div>
-
-        <div class="hint">Se recordará el último tipo y banco usados.</div>
 
         <div class="actions">
-          <button type="button" id="closeModalBtn">Cerrar</button>
-          <button type="submit" id="saveBtn">Guardar</button>
+          <button type="button" id="cerrarMovimiento">Cerrar</button>
+          <button type="submit" id="guardarMovimiento">Guardar movimiento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL REPARTO -->
+  <div class="modal" id="modalReparto">
+    <div class="modal-box">
+      <h2>Nuevo reparto</h2>
+      <form id="formReparto">
+        <div class="form-group">
+          <label for="repTrabajoId">Trabajo</label>
+          <select id="repTrabajoId" name="trabajoId" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="repPersona">Persona</label>
+          <input id="repPersona" name="persona" required>
+        </div>
+
+        <div class="form-group">
+          <label for="repPorcentaje">Porcentaje</label>
+          <input id="repPorcentaje" name="porcentaje" type="number" step="0.01" min="0.01" max="100" required>
+        </div>
+
+        <div class="hint">El porcentaje total por trabajo no puede superar 100%.</div>
+
+        <div class="actions">
+          <button type="button" id="cerrarReparto">Cerrar</button>
+          <button type="submit" id="guardarReparto">Guardar reparto</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbxvpNxDIAJKY5GQ2JcDacOGg9K3EwJlT9wvNZY00XB0L1q5EiFne_ha8wJDexsLMFHAxg/exec';
-    const STORAGE_LAST_TIPO = 'registroPagos.lastTipo';
-    const STORAGE_LAST_BANCO = 'registroPagos.lastBanco';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyu20O24Rt5Am3LPVzeCOD22M9q_6mkm557pFrLMVxLw2fOCis3IXdmzSdTAyw98UQ/exec';
+    const STORAGE_LAST_TIPO = 'trabajos.lastTipo';
+    const STORAGE_LAST_BANCO = 'trabajos.lastBanco';
 
-    const modal = document.getElementById('modal');
-    const openModalBtn = document.getElementById('openModalBtn');
-    const closeModalBtn = document.getElementById('closeModalBtn');
+    const statusEl = document.getElementById('status');
+
+    const btnNuevoTrabajo = document.getElementById('btnNuevoTrabajo');
+    const btnNuevoMovimiento = document.getElementById('btnNuevoMovimiento');
+    const btnNuevoReparto = document.getElementById('btnNuevoReparto');
+
     const btnHoy = document.getElementById('btnHoy');
     const btn7Dias = document.getElementById('btn7Dias');
     const btnTodo = document.getElementById('btnTodo');
 
-    const formRegistro = document.getElementById('formRegistro');
-    const tablaBody = document.getElementById('tablaBody');
-    const statusEl = document.getElementById('status');
-
-    const clienteFiltro = document.getElementById('clienteFiltro');
+    const trabajoFiltro = document.getElementById('trabajoFiltro');
     const tipoFiltro = document.getElementById('tipoFiltro');
     const fechaInicioFiltro = document.getElementById('fechaInicioFiltro');
     const fechaFinFiltro = document.getElementById('fechaFinFiltro');
 
-    const tipoSelect = document.getElementById('tipo');
-    const clienteInput = document.getElementById('cliente');
-    const proveedorWrap = document.getElementById('proveedorWrap');
-    const proveedorInput = document.getElementById('proveedor');
-    const bancoSelect = document.getElementById('banco');
-    const conceptoInput = document.getElementById('concepto');
+    const tablaMovimientos = document.getElementById('tablaMovimientos');
+    const tablaRepartos = document.getElementById('tablaRepartos');
 
-    const totalIngresosEl = document.getElementById('totalIngresos');
-    const totalEgresosEl = document.getElementById('totalEgresos');
-    const saldoTotalEl = document.getElementById('saldoTotal');
-    const saveBtn = document.getElementById('saveBtn');
+    const cardCliente = document.getElementById('cardCliente');
+    const cardProducto = document.getElementById('cardProducto');
+    const cardVenta = document.getElementById('cardVenta');
+    const cardCosto = document.getElementById('cardCosto');
+    const cardCobrado = document.getElementById('cardCobrado');
+    const cardUtilidadEsperada = document.getElementById('cardUtilidadEsperada');
+    const cardUtilidadCobrada = document.getElementById('cardUtilidadCobrada');
+    const cardIgv = document.getElementById('cardIgv');
+    const cardIncluyeIgv = document.getElementById('cardIncluyeIgv');
+    const cardEstado = document.getElementById('cardEstado');
+    const cardCantidad = document.getElementById('cardCantidad');
+    const cardPrecioUnitario = document.getElementById('cardPrecioUnitario');
 
-    const clientesListFiltro = document.getElementById('clientesListFiltro');
-    const clientesListForm = document.getElementById('clientesListForm');
-    const proveedoresListForm = document.getElementById('proveedoresListForm');
+    const modalTrabajo = document.getElementById('modalTrabajo');
+    const modalMovimiento = document.getElementById('modalMovimiento');
+    const modalReparto = document.getElementById('modalReparto');
 
-    let registros = [];
+    const formTrabajo = document.getElementById('formTrabajo');
+    const formMovimiento = document.getElementById('formMovimiento');
+    const formReparto = document.getElementById('formReparto');
 
-    function normalizeText(value) {
-      return String(value || '')
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim()
-        .toLowerCase();
-    }
+    const cerrarTrabajo = document.getElementById('cerrarTrabajo');
+    const cerrarMovimiento = document.getElementById('cerrarMovimiento');
+    const cerrarReparto = document.getElementById('cerrarReparto');
+
+    const guardarTrabajo = document.getElementById('guardarTrabajo');
+    const guardarMovimiento = document.getElementById('guardarMovimiento');
+    const guardarReparto = document.getElementById('guardarReparto');
+
+    const movTrabajoId = document.getElementById('movTrabajoId');
+    const movClienteDisplay = document.getElementById('movClienteDisplay');
+    const movTipo = document.getElementById('movTipo');
+    const movProveedorWrap = document.getElementById('movProveedorWrap');
+    const movProveedor = document.getElementById('movProveedor');
+    const movBanco = document.getElementById('movBanco');
+
+    const repTrabajoId = document.getElementById('repTrabajoId');
+
+    let trabajos = [];
+    let detalleTrabajo = null;
 
     function escapeHtml(value) {
       return String(value || '')
@@ -509,108 +667,98 @@
       return local.toISOString().slice(0, 10);
     }
 
-    function setFiltrosHoy() {
-      const hoy = getTodayLocal();
-      fechaInicioFiltro.value = hoy;
-      fechaFinFiltro.value = hoy;
-      updateView();
+    async function apiGet(action, params = {}) {
+      const search = new URLSearchParams({ action, ...params });
+      const res = await fetch(`${API_URL}?${search.toString()}`);
+      return res.json();
     }
 
-    function setFiltros7Dias() {
-      const hoy = getTodayLocal();
-      fechaInicioFiltro.value = addDays(hoy, -6);
-      fechaFinFiltro.value = hoy;
-      updateView();
-    }
-
-    function setFiltrosTodo() {
-      fechaInicioFiltro.value = '';
-      fechaFinFiltro.value = '';
-      updateView();
-    }
-
-    function normalizeRecord(record) {
-      const fecha = String(record.fecha || '');
-      return {
-        fecha,
-        fechaSolo: fecha.slice(0, 10),
-        tipo: String(record.tipo || '').trim(),
-        cliente: String(record.cliente || '').trim(),
-        proveedor: String(record.proveedor || '').trim(),
-        banco: String(record.banco || '').trim(),
-        concepto: String(record.concepto || '').trim(),
-        numeroOperacion: String(record.numeroOperacion || '').trim(),
-        monto: Number(record.monto || 0),
-        observacion: String(record.observacion || '').trim()
-      };
-    }
-
-    function uniqueSorted(values) {
-      const map = new Map();
-
-      values.forEach(value => {
-        const clean = String(value || '').trim();
-        if (!clean) return;
-        const key = normalizeText(clean);
-        if (!map.has(key)) {
-          map.set(key, clean);
-        }
+    async function apiPost(action, params = {}) {
+      const body = new URLSearchParams({ action, ...params });
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body
       });
-
-      return Array.from(map.values()).sort((a, b) => a.localeCompare(b, 'es'));
+      return res.json();
     }
 
-    function renderDatalist(datalistEl, values) {
-      datalistEl.innerHTML = values.map(value => `<option value="${escapeHtml(value)}"></option>`).join('');
+    function openModal(modal) {
+      modal.classList.add('show');
     }
 
-    function updateCatalogs() {
-      const clientes = uniqueSorted(registros.map(r => r.cliente));
-      const proveedores = uniqueSorted(registros.map(r => r.proveedor));
-
-      renderDatalist(clientesListFiltro, clientes);
-      renderDatalist(clientesListForm, clientes);
-      renderDatalist(proveedoresListForm, proveedores);
-    }
-
-    function toggleProveedor() {
-      const esEgreso = tipoSelect.value === 'Egreso';
-      proveedorWrap.style.display = esEgreso ? 'block' : 'none';
-      if (!esEgreso) {
-        proveedorInput.value = '';
-      }
+    function closeModal(modal, form = null) {
+      modal.classList.remove('show');
+      if (form) form.reset();
     }
 
     function savePreferences() {
-      localStorage.setItem(STORAGE_LAST_TIPO, tipoSelect.value || 'Ingreso');
-      localStorage.setItem(STORAGE_LAST_BANCO, bancoSelect.value || '');
+      localStorage.setItem(STORAGE_LAST_TIPO, movTipo.value || 'Ingreso');
+      localStorage.setItem(STORAGE_LAST_BANCO, movBanco.value || '');
     }
 
     function loadPreferences() {
       const lastTipo = localStorage.getItem(STORAGE_LAST_TIPO);
       const lastBanco = localStorage.getItem(STORAGE_LAST_BANCO);
 
-      if (lastTipo) {
-        tipoSelect.value = lastTipo;
-      }
-
-      if (lastBanco) {
-        bancoSelect.value = lastBanco;
-      }
+      if (lastTipo) movTipo.value = lastTipo;
+      if (lastBanco) movBanco.value = lastBanco;
 
       toggleProveedor();
     }
 
-    function openModal() {
-      modal.classList.add('show');
-      loadPreferences();
-      setTimeout(() => clienteInput.focus(), 50);
+    function toggleProveedor() {
+      const esEgreso = movTipo.value === 'Egreso';
+      movProveedorWrap.style.display = esEgreso ? 'block' : 'none';
+      if (!esEgreso) movProveedor.value = '';
     }
 
-    function closeModal() {
-      modal.classList.remove('show');
-      formRegistro.reset();
-      loadPreferences();
+    function renderTrabajoOptions() {
+      const options = trabajos.map(t => {
+        const text = `${t.trabajoId} - ${t.cliente} - ${t.productoVenta}`;
+        return `<option value="${escapeHtml(t.trabajoId)}">${escapeHtml(text)}</option>`;
+      }).join('');
+
+      trabajoFiltro.innerHTML = options || '<option value="">Sin trabajos</option>';
+      movTrabajoId.innerHTML = options || '<option value="">Sin trabajos</option>';
+      repTrabajoId.innerHTML = options || '<option value="">Sin trabajos</option>';
+    }
+
+    function getTrabajoById(trabajoId) {
+      return trabajos.find(t => t.trabajoId === trabajoId) || null;
+    }
+
+    function syncTrabajoInForms() {
+      const trabajoId = trabajoFiltro.value;
+      if (trabajoId) {
+        movTrabajoId.value = trabajoId;
+        repTrabajoId.value = trabajoId;
+      }
+      syncMovimientoCliente();
+    }
+
+    function syncMovimientoCliente() {
+      const trabajo = getTrabajoById(movTrabajoId.value);
+      movClienteDisplay.value = trabajo ? trabajo.cliente : '';
+    }
+
+    function setFiltrosHoy() {
+      const hoy = getTodayLocal();
+      fechaInicioFiltro.value = hoy;
+      fechaFinFiltro.value = hoy;
+      renderMovimientosFiltrados();
+    }
+
+    function setFiltros7Dias() {
+      const hoy = getTodayLocal();
+      fechaInicioFiltro.value = addDays(hoy, -6);
+      fechaFinFiltro.value = hoy;
+      renderMovimientosFiltrados();
+    }
+
+    function setFiltrosTodo() {
+      fechaInicioFiltro.value = '';
+      fechaFinFiltro.value = '';
+      renderMovimientosFiltrados();
     }
 
     function getRangoFechas() {
@@ -626,158 +774,290 @@
       return { inicio, fin };
     }
 
-    function getFilteredData() {
-      const clienteBuscado = normalizeText(clienteFiltro.value);
+    function getMovimientosFiltrados() {
+      if (!detalleTrabajo || !detalleTrabajo.movimientos) return [];
+
       const tipo = tipoFiltro.value;
       const { inicio, fin } = getRangoFechas();
 
-      return registros.filter(r => {
-        const okCliente = !clienteBuscado || normalizeText(r.cliente).includes(clienteBuscado);
-        const okTipo = !tipo || r.tipo === tipo;
-        const okInicio = !inicio || r.fechaSolo >= inicio;
-        const okFin = !fin || r.fechaSolo <= fin;
-        return okCliente && okTipo && okInicio && okFin;
+      return detalleTrabajo.movimientos.filter(item => {
+        const fechaSolo = String(item.fecha || '').slice(0, 10);
+        const okTipo = !tipo || item.tipo === tipo;
+        const okInicio = !inicio || fechaSolo >= inicio;
+        const okFin = !fin || fechaSolo <= fin;
+        return okTipo && okInicio && okFin;
       });
     }
 
-    function renderResumen(data) {
-      const totalIngresos = data
-        .filter(r => r.tipo === 'Ingreso')
-        .reduce((acc, r) => acc + r.monto, 0);
+    function renderResumenTrabajo() {
+      if (!detalleTrabajo || !detalleTrabajo.trabajo) {
+        cardCliente.textContent = '-';
+        cardProducto.textContent = '-';
+        cardVenta.textContent = '0.00';
+        cardCosto.textContent = '0.00';
+        cardCobrado.textContent = '0.00';
+        cardUtilidadEsperada.textContent = '0.00';
+        cardUtilidadCobrada.textContent = '0.00';
+        cardIgv.textContent = '0.00';
+        cardIncluyeIgv.textContent = '-';
+        cardEstado.textContent = '-';
+        cardCantidad.textContent = '0';
+        cardPrecioUnitario.textContent = '0.00';
+        return;
+      }
 
-      const totalEgresos = data
-        .filter(r => r.tipo === 'Egreso')
-        .reduce((acc, r) => acc + r.monto, 0);
+      const t = detalleTrabajo.trabajo;
+      const r = detalleTrabajo.resumen;
 
-      totalIngresosEl.textContent = formatMoney(totalIngresos);
-      totalEgresosEl.textContent = formatMoney(totalEgresos);
-      saldoTotalEl.textContent = formatMoney(totalIngresos - totalEgresos);
+      cardCliente.textContent = t.cliente || '-';
+      cardProducto.textContent = t.productoVenta || '-';
+      cardVenta.textContent = formatMoney(r.totalVenta);
+      cardCosto.textContent = formatMoney(r.costoReal);
+      cardCobrado.textContent = formatMoney(r.totalCobrado);
+      cardUtilidadEsperada.textContent = formatMoney(r.utilidadEsperada);
+      cardUtilidadCobrada.textContent = formatMoney(r.utilidadCobrada);
+      cardIgv.textContent = formatMoney(r.igv);
+      cardIncluyeIgv.textContent = r.incluyeIGV || '-';
+      cardEstado.textContent = t.estado || '-';
+      cardCantidad.textContent = String(t.cantidad || 0);
+      cardPrecioUnitario.textContent = formatMoney(t.precioUnitarioVenta);
     }
 
-    function renderTabla(data) {
+    function renderMovimientosFiltrados() {
+      const data = getMovimientosFiltrados();
+
       if (!data.length) {
-        tablaBody.innerHTML = `
+        tablaMovimientos.innerHTML = `
           <tr>
-            <td colspan="9" class="empty-row">No hay registros</td>
+            <td colspan="9" class="empty">No hay movimientos</td>
           </tr>
         `;
         return;
       }
 
-      const html = data.map(r => `
+      tablaMovimientos.innerHTML = data.map(item => `
         <tr>
-          <td data-label="Fecha">${escapeHtml(r.fecha)}</td>
-          <td data-label="Tipo" class="${r.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(r.tipo)}</td>
-          <td data-label="Cliente">${escapeHtml(r.cliente)}</td>
-          <td data-label="Proveedor">${escapeHtml(r.proveedor)}</td>
-          <td data-label="Banco">${escapeHtml(r.banco)}</td>
-          <td data-label="Concepto">${escapeHtml(r.concepto)}</td>
-          <td data-label="N° Operación">${escapeHtml(r.numeroOperacion)}</td>
-          <td data-label="Monto">${formatMoney(r.monto)}</td>
-          <td data-label="Observación">${escapeHtml(r.observacion)}</td>
+          <td data-label="Fecha">${escapeHtml(item.fecha)}</td>
+          <td data-label="Tipo" class="${item.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(item.tipo)}</td>
+          <td data-label="Categoría">${escapeHtml(item.categoria)}</td>
+          <td data-label="Proveedor">${escapeHtml(item.proveedor)}</td>
+          <td data-label="Banco">${escapeHtml(item.banco)}</td>
+          <td data-label="Concepto">${escapeHtml(item.concepto)}</td>
+          <td data-label="N° Operación">${escapeHtml(item.numeroOperacion)}</td>
+          <td data-label="Monto">${formatMoney(item.monto)}</td>
+          <td data-label="Observación">${escapeHtml(item.observacion)}</td>
         </tr>
       `).join('');
-
-      tablaBody.innerHTML = html;
     }
 
-    function updateView() {
-      const data = getFilteredData();
-      renderTabla(data);
-      renderResumen(data);
+    function renderRepartos() {
+      const reparto = (detalleTrabajo && detalleTrabajo.resumen && detalleTrabajo.resumen.reparto) || [];
+
+      if (!reparto.length) {
+        tablaRepartos.innerHTML = `
+          <tr>
+            <td colspan="4" class="empty">No hay repartos</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tablaRepartos.innerHTML = reparto.map(item => `
+        <tr>
+          <td data-label="Persona">${escapeHtml(item.persona)}</td>
+          <td data-label="%">${formatMoney(item.porcentaje)}</td>
+          <td data-label="Utilidad esperada">${formatMoney(item.montoUtilidadEsperada)}</td>
+          <td data-label="Utilidad cobrada">${formatMoney(item.montoUtilidadCobrada)}</td>
+        </tr>
+      `).join('');
     }
 
-    async function cargarDatos() {
-      statusEl.textContent = 'Cargando...';
+    async function loadTrabajos(selectTrabajoId = '') {
+      statusEl.textContent = 'Cargando trabajos...';
 
       try {
-        const res = await fetch(API_URL);
-        const json = await res.json();
+        const json = await apiGet('listTrabajos');
 
-        if (!json.ok) {
-          throw new Error(json.error || 'No se pudo cargar');
+        if (!json.ok) throw new Error(json.error || 'No se pudo cargar trabajos');
+
+        trabajos = json.data || [];
+        renderTrabajoOptions();
+
+        if (trabajos.length === 0) {
+          detalleTrabajo = null;
+          renderResumenTrabajo();
+          renderMovimientosFiltrados();
+          renderRepartos();
+          statusEl.textContent = 'No hay trabajos todavía';
+          return;
         }
 
-        registros = (json.data || []).map(normalizeRecord).reverse();
-        updateCatalogs();
-        updateView();
-        statusEl.textContent = '';
+        trabajoFiltro.value = selectTrabajoId || trabajoFiltro.value || trabajos[0].trabajoId;
+        syncTrabajoInForms();
+        await loadDetalleTrabajo(trabajoFiltro.value);
+
       } catch (error) {
         console.error(error);
-        statusEl.textContent = 'Error al cargar datos';
+        statusEl.textContent = 'Error al cargar trabajos';
       }
     }
 
-    formRegistro.addEventListener('submit', async function (e) {
-      e.preventDefault();
+    async function loadDetalleTrabajo(trabajoId) {
+      if (!trabajoId) {
+        detalleTrabajo = null;
+        renderResumenTrabajo();
+        renderMovimientosFiltrados();
+        renderRepartos();
+        return;
+      }
 
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'Guardando...';
+      statusEl.textContent = 'Cargando detalle...';
 
       try {
-        const formData = new FormData(formRegistro);
-        const body = new URLSearchParams(formData);
+        const json = await apiGet('getResumenTrabajo', { trabajoId });
 
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          body
-        });
+        if (!json.ok) throw new Error(json.error || 'No se pudo cargar detalle');
 
-        const json = await res.json();
+        detalleTrabajo = json.data;
+        renderResumenTrabajo();
+        renderMovimientosFiltrados();
+        renderRepartos();
+        statusEl.textContent = '';
+
+      } catch (error) {
+        console.error(error);
+        statusEl.textContent = 'Error al cargar detalle del trabajo';
+      }
+    }
+
+    formTrabajo.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      guardarTrabajo.disabled = true;
+      guardarTrabajo.textContent = 'Guardando...';
+
+      try {
+        const formData = new FormData(formTrabajo);
+        const json = await apiPost('createTrabajo', Object.fromEntries(formData.entries()));
 
         if (!json.ok) {
-          alert(json.error || 'No se pudo guardar');
+          alert(json.error || 'No se pudo guardar el trabajo');
+          return;
+        }
+
+        closeModal(modalTrabajo, formTrabajo);
+        await loadTrabajos(json.record.trabajoId);
+
+      } catch (error) {
+        console.error(error);
+        alert('Error al guardar trabajo');
+      } finally {
+        guardarTrabajo.disabled = false;
+        guardarTrabajo.textContent = 'Guardar trabajo';
+      }
+    });
+
+    formMovimiento.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      guardarMovimiento.disabled = true;
+      guardarMovimiento.textContent = 'Guardando...';
+
+      try {
+        const formData = new FormData(formMovimiento);
+        const json = await apiPost('createMovimiento', Object.fromEntries(formData.entries()));
+
+        if (!json.ok) {
+          alert(json.error || 'No se pudo guardar el movimiento');
           return;
         }
 
         savePreferences();
+        closeModal(modalMovimiento, formMovimiento);
+        loadPreferences();
+        syncTrabajoInForms();
+        await loadDetalleTrabajo(trabajoFiltro.value);
 
-        if (json.record) {
-          registros.unshift(normalizeRecord(json.record));
-          updateCatalogs();
-          updateView();
-        } else {
-          await cargarDatos();
-        }
-
-        closeModal();
       } catch (error) {
         console.error(error);
-        alert('Error al guardar');
+        alert('Error al guardar movimiento');
       } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'Guardar';
+        guardarMovimiento.disabled = false;
+        guardarMovimiento.textContent = 'Guardar movimiento';
       }
     });
 
-    tipoSelect.addEventListener('change', () => {
+    formReparto.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      guardarReparto.disabled = true;
+      guardarReparto.textContent = 'Guardando...';
+
+      try {
+        const formData = new FormData(formReparto);
+        const json = await apiPost('createReparto', Object.fromEntries(formData.entries()));
+
+        if (!json.ok) {
+          alert(json.error || 'No se pudo guardar el reparto');
+          return;
+        }
+
+        closeModal(modalReparto, formReparto);
+        await loadDetalleTrabajo(trabajoFiltro.value);
+
+      } catch (error) {
+        console.error(error);
+        alert('Error al guardar reparto');
+      } finally {
+        guardarReparto.disabled = false;
+        guardarReparto.textContent = 'Guardar reparto';
+      }
+    });
+
+    btnNuevoTrabajo.addEventListener('click', () => openModal(modalTrabajo));
+    btnNuevoMovimiento.addEventListener('click', () => {
+      syncTrabajoInForms();
+      loadPreferences();
+      openModal(modalMovimiento);
+    });
+    btnNuevoReparto.addEventListener('click', () => {
+      syncTrabajoInForms();
+      openModal(modalReparto);
+    });
+
+    cerrarTrabajo.addEventListener('click', () => closeModal(modalTrabajo, formTrabajo));
+    cerrarMovimiento.addEventListener('click', () => closeModal(modalMovimiento, formMovimiento));
+    cerrarReparto.addEventListener('click', () => closeModal(modalReparto, formReparto));
+
+    movTipo.addEventListener('change', () => {
       toggleProveedor();
       savePreferences();
     });
 
-    bancoSelect.addEventListener('change', savePreferences);
+    movBanco.addEventListener('change', savePreferences);
+    movTrabajoId.addEventListener('change', syncMovimientoCliente);
 
-    openModalBtn.addEventListener('click', openModal);
-    closeModalBtn.addEventListener('click', closeModal);
+    trabajoFiltro.addEventListener('change', async () => {
+      syncTrabajoInForms();
+      await loadDetalleTrabajo(trabajoFiltro.value);
+    });
+
+    tipoFiltro.addEventListener('change', renderMovimientosFiltrados);
+    fechaInicioFiltro.addEventListener('change', renderMovimientosFiltrados);
+    fechaFinFiltro.addEventListener('change', renderMovimientosFiltrados);
 
     btnHoy.addEventListener('click', setFiltrosHoy);
     btn7Dias.addEventListener('click', setFiltros7Dias);
     btnTodo.addEventListener('click', setFiltrosTodo);
 
-    clienteFiltro.addEventListener('input', updateView);
-    tipoFiltro.addEventListener('change', updateView);
-    fechaInicioFiltro.addEventListener('change', updateView);
-    fechaFinFiltro.addEventListener('change', updateView);
-
-    modal.addEventListener('click', function (e) {
-      if (e.target === modal) {
-        closeModal();
-      }
+    [modalTrabajo, modalMovimiento, modalReparto].forEach(modal => {
+      modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
     });
 
-    setFiltrosHoy();
     loadPreferences();
-    cargarDatos();
+    setFiltrosTodo();
+    loadTrabajos();
   </script>
 </body>
 </html>
