@@ -518,7 +518,7 @@
       }
 
      .filters-grid {
-        grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 180px;
+        grid-template-columns: 1.4fr 1fr 1.4fr 1fr 1fr 1fr 180px;
         align-items: end;
       }
 
@@ -703,13 +703,23 @@
           <select id="trabajoFiltro"></select>
         </div>
 
-        <div class="field">
+                <div class="field">
           <label for="tipoFiltro">Tipo</label>
           <select id="tipoFiltro">
             <option value="">Todos</option>
             <option value="Ingreso">Ingreso</option>
             <option value="Egreso">Egreso</option>
           </select>
+        </div>
+
+        <div class="field">
+          <label for="movimientoBusquedaFiltro">Buscar movimiento</label>
+          <input
+            id="movimientoBusquedaFiltro"
+            type="text"
+            placeholder="Concepto, proveedor, banco, operación..."
+            autocomplete="off"
+          >
         </div>
 
         <div class="field field-date">
@@ -1049,6 +1059,7 @@
 
     const trabajoFiltro = document.getElementById('trabajoFiltro');
     const tipoFiltro = document.getElementById('tipoFiltro');
+    const movimientoBusquedaFiltro = document.getElementById('movimientoBusquedaFiltro');
     const fechaInicioFiltro = document.getElementById('fechaInicioFiltro');
     const fechaFinFiltro = document.getElementById('fechaFinFiltro');
     const estadoTrabajoUpdate = document.getElementById('estadoTrabajoUpdate');
@@ -1109,6 +1120,14 @@
 
     function formatMoney(value) {
       return Number(value || 0).toFixed(2);
+    }
+
+    function normalizeText(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
     }
 
     function getTodayLocal() {
@@ -1236,18 +1255,32 @@
       return { inicio, fin };
     }
 
-    function getMovimientosFiltrados() {
+        function getMovimientosFiltrados() {
       if (!detalleTrabajo || !detalleTrabajo.movimientos) return [];
 
       const tipo = tipoFiltro.value;
+      const busqueda = normalizeText(movimientoBusquedaFiltro.value);
       const { inicio, fin } = getRangoFechas();
 
       return detalleTrabajo.movimientos.filter(item => {
         const fechaSolo = String(item.fecha || '').slice(0, 10);
+        const textoMovimiento = normalizeText([
+          item.fecha,
+          item.tipo,
+          item.categoria,
+          item.proveedor,
+          item.banco,
+          item.concepto,
+          item.numeroOperacion,
+          item.observacion
+        ].join(' '));
+
         const okTipo = !tipo || item.tipo === tipo;
         const okInicio = !inicio || fechaSolo >= inicio;
         const okFin = !fin || fechaSolo <= fin;
-        return okTipo && okInicio && okFin;
+        const okBusqueda = !busqueda || textoMovimiento.includes(busqueda);
+
+        return okTipo && okInicio && okFin && okBusqueda;
       });
     }
 
@@ -1534,6 +1567,7 @@
     });
 
     tipoFiltro.addEventListener('change', renderMovimientosFiltrados);
+    movimientoBusquedaFiltro.addEventListener('input', renderMovimientosFiltrados);
     fechaInicioFiltro.addEventListener('change', renderMovimientosFiltrados);
     fechaFinFiltro.addEventListener('change', renderMovimientosFiltrados);
 
