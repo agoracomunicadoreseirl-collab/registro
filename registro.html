@@ -5,84 +5,296 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Control de Trabajos</title>
   <style>
-    * { box-sizing: border-box; }
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #dbe3ee;
+      --border-strong: #c7d2e3;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --success: #16a34a;
+      --success-soft: #dcfce7;
+      --danger: #dc2626;
+      --danger-soft: #fee2e2;
+      --warning: #d97706;
+      --warning-soft: #fef3c7;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
 
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
       padding: 12px;
-      background: #f5f5f5;
-      color: #222;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.06), transparent 30%),
+        radial-gradient(circle at top right, rgba(22, 163, 74, 0.05), transparent 28%),
+        var(--bg);
+      color: var(--text);
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 1120px;
       margin: 0 auto;
     }
 
-    h1, h2 {
-      margin: 0 0 12px;
+    .topbar {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #fff;
+      border-radius: 20px;
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
     }
 
-    h1 { font-size: 22px; }
-    h2 { font-size: 18px; }
-
-    button, input, select, textarea {
-      width: 100%;
-      font-size: 16px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      background: #fff;
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
     }
 
-    button { cursor: pointer; }
+    .topbar p {
+      margin: 8px 0 0;
+      font-size: 14px;
+      color: rgba(255,255,255,0.82);
+    }
 
-    .grid, .actions-grid, .summary-grid, .section-grid {
-      display: grid;
-      gap: 8px;
+    .panel,
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
       margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .actions-grid,
+    .filters-grid,
+    .summary-grid {
+      display: grid;
+      gap: 10px;
     }
 
     .actions-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-bottom: 14px;
     }
 
-    .grid {
+    .filters-grid {
       grid-template-columns: 1fr;
     }
 
     .summary-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
     }
 
-    .section {
+    .field label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      width: 100%;
+      font-size: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border-strong);
       background: #fff;
-      border: 1px solid #ddd;
-      padding: 12px;
-      margin-bottom: 12px;
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease, transform .05s ease;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+    }
+
+    input[readonly] {
+      background: var(--surface-soft);
+      color: #475569;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--border-strong);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-soft);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+      border-color: var(--success);
+    }
+
+    .btn-success:hover {
+      filter: brightness(0.96);
+    }
+
+    .btn-danger {
+      background: #fff;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .btn-danger:hover {
+      background: #fff5f5;
+    }
+
+    .btn-soft {
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      border-color: transparent;
+    }
+
+    .btn-soft:hover {
+      background: #cfe3ff;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .status:empty {
+      display: none;
     }
 
     .card {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 12px;
+      position: relative;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 102px;
+      overflow: hidden;
     }
 
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
+      background: var(--primary-soft);
+    }
+
+    .card.card-primary::after { background: var(--primary); }
+    .card.card-success::after { background: var(--success); }
+    .card.card-danger::after { background: var(--danger); }
+    .card.card-warning::after { background: var(--warning); }
+
     .card-title {
-      font-size: 13px;
-      color: #666;
-      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
     }
 
     .card-value {
       font-size: 20px;
-      font-weight: bold;
+      font-weight: 800;
+      line-height: 1.15;
+      color: var(--text);
+      word-break: break-word;
     }
 
-    .status {
-      font-size: 14px;
-      color: #555;
-      margin-bottom: 12px;
+    .card-value.small {
+      font-size: 16px;
+      line-height: 1.25;
     }
 
     .table-wrap {
@@ -91,7 +303,10 @@
       border: none;
     }
 
-    table, tbody, tr, td {
+    table,
+    tbody,
+    tr,
+    td {
       display: block;
       width: 100%;
     }
@@ -106,23 +321,27 @@
     }
 
     tr {
-      background: #fff;
-      border: 1px solid #ddd;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
       margin-bottom: 12px;
-      padding: 6px 0;
+      overflow: hidden;
     }
 
-    th, td {
+    th,
+    td {
       font-size: 14px;
     }
 
     td {
       border: none;
-      border-bottom: 1px solid #f0f0f0;
-      padding: 8px 10px 8px 42%;
+      border-bottom: 1px solid #eef2f7;
+      padding: 10px 12px 10px 44%;
       position: relative;
-      min-height: 20px;
+      min-height: 22px;
       word-break: break-word;
+      line-height: 1.35;
     }
 
     td:last-child {
@@ -132,61 +351,67 @@
     td::before {
       content: attr(data-label);
       position: absolute;
-      left: 10px;
-      top: 8px;
-      width: 36%;
-      font-weight: bold;
-      color: #666;
+      left: 12px;
+      top: 10px;
+      width: 34%;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1.25;
+    }
+
+    .badge-ingreso,
+    .badge-egreso {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-width: 88px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .02em;
     }
 
     .badge-ingreso {
-      color: green;
-      font-weight: bold;
+      background: var(--success-soft);
+      color: var(--success);
     }
 
     .badge-egreso {
-      color: #b00020;
-      font-weight: bold;
+      background: var(--danger-soft);
+      color: var(--danger);
     }
 
     .empty {
-      background: #fff;
-      border: 1px solid #ddd;
-      padding: 12px;
+      background: var(--surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: 16px;
+      padding: 18px;
       font-size: 14px;
+      color: var(--muted);
+      text-align: center;
+      box-shadow: none;
     }
 
-    .form-group {
-      margin-bottom: 10px;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 14px;
-    }
-
-    textarea {
-      min-height: 70px;
-      resize: vertical;
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+      line-height: 1.35;
     }
 
     .actions {
       display: grid;
       gap: 8px;
-      margin-top: 12px;
-    }
-
-    .hint {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
+      margin-top: 14px;
     }
 
     .modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, .4);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
       display: none;
       align-items: center;
       justify-content: center;
@@ -200,23 +425,73 @@
 
     .modal-box {
       width: 100%;
-      max-width: 520px;
+      max-width: 560px;
       background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 22px;
       padding: 16px;
-      border: 1px solid #ccc;
       max-height: 92vh;
       overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.22);
     }
 
-    @media (min-width: 701px) {
-      body { padding: 16px; }
+    .modal-title {
+      margin: 0 0 6px;
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .modal-subtitle {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .divider {
+      height: 1px;
+      background: #eef2f7;
+      margin: 14px 0;
+    }
+
+    .muted-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+    }
+
+    @media (min-width: 560px) {
+      .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 760px) {
+      body {
+        padding: 16px;
+      }
+
+      .topbar {
+        padding: 22px 22px;
+      }
+
+      .topbar h1 {
+        font-size: 28px;
+      }
 
       .actions-grid {
         grid-template-columns: repeat(6, 1fr);
       }
 
-      .grid {
-        grid-template-columns: 1.3fr 1fr 1fr 1fr;
+      .filters-grid {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
         align-items: end;
       }
 
@@ -227,17 +502,25 @@
       .actions {
         display: flex;
         justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .actions button {
+        width: auto;
+        min-width: 150px;
       }
 
       .table-wrap {
         overflow-x: auto;
-        background: #fff;
-        border: 1px solid #ddd;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
       }
 
       table {
         width: 100%;
-        min-width: 900px;
+        min-width: 940px;
         display: table;
       }
 
@@ -253,116 +536,163 @@
         display: table-row;
         background: transparent;
         border: none;
-        margin-bottom: 0;
-        padding: 0;
+        box-shadow: none;
+        border-radius: 0;
       }
 
-      th, td {
+      th,
+      td {
         display: table-cell;
         width: auto;
         position: static;
-        padding: 10px;
-        border-bottom: 1px solid #e5e5e5;
+        padding: 12px 12px;
+        border-bottom: 1px solid #e8edf5;
         text-align: left;
         vertical-align: top;
       }
 
       th {
-        background: #fafafa;
+        background: #f8fafc;
+        color: #334155;
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      td {
+        background: #fff;
       }
 
       td::before {
         display: none;
+      }
+
+      tbody tr:hover td {
+        background: #fbfdff;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .topbar h1 {
+        font-size: 20px;
+      }
+
+      .card-value {
+        font-size: 18px;
+      }
+
+      td {
+        padding-left: 46%;
+      }
+
+      td::before {
+        width: 32%;
       }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>Control de Trabajos</h1>
-
-    <div class="actions-grid">
-      <button type="button" id="btnNuevoTrabajo">Nuevo trabajo</button>
-      <button type="button" id="btnNuevoMovimiento">Nuevo movimiento</button>
-      <button type="button" id="btnNuevoReparto">Nuevo reparto</button>
-      <button type="button" id="btnHoy">Hoy</button>
-      <button type="button" id="btn7Dias">7 días</button>
-      <button type="button" id="btnTodo">Todo</button>
+    <div class="topbar">
+      <h1>Control de Trabajos</h1>
+      <p>Registra trabajos, costos, cobros y reparto de utilidad desde el celular de forma clara y rápida.</p>
     </div>
 
-    <div class="grid">
-      <div class="form-group">
-        <label for="trabajoFiltro">Trabajo</label>
-        <select id="trabajoFiltro"></select>
+    <div class="panel">
+      <div class="actions-grid">
+        <button type="button" id="btnNuevoTrabajo" class="btn btn-primary">+ Nuevo trabajo</button>
+        <button type="button" id="btnNuevoMovimiento" class="btn btn-success">+ Movimiento</button>
+        <button type="button" id="btnNuevoReparto" class="btn btn-secondary">+ Reparto</button>
+        <button type="button" id="btnHoy" class="btn btn-soft">Hoy</button>
+        <button type="button" id="btn7Dias" class="btn btn-soft">7 días</button>
+        <button type="button" id="btnTodo" class="btn btn-soft">Todo</button>
       </div>
 
-      <div class="form-group">
-        <label for="tipoFiltro">Tipo</label>
-        <select id="tipoFiltro">
-          <option value="">Todos</option>
-          <option value="Ingreso">Ingreso</option>
-          <option value="Egreso">Egreso</option>
-        </select>
-      </div>
+      <div class="filters-grid">
+        <div class="field">
+          <label for="trabajoFiltro">Trabajo</label>
+          <select id="trabajoFiltro"></select>
+        </div>
 
-      <div class="form-group">
-        <label for="fechaInicioFiltro">Fecha inicio</label>
-        <input id="fechaInicioFiltro" type="date">
-      </div>
+        <div class="field">
+          <label for="tipoFiltro">Tipo</label>
+          <select id="tipoFiltro">
+            <option value="">Todos</option>
+            <option value="Ingreso">Ingreso</option>
+            <option value="Egreso">Egreso</option>
+          </select>
+        </div>
 
-      <div class="form-group">
-        <label for="fechaFinFiltro">Fecha fin</label>
-        <input id="fechaFinFiltro" type="date">
+        <div class="field">
+          <label for="fechaInicioFiltro">Fecha inicio</label>
+          <input id="fechaInicioFiltro" type="date">
+        </div>
+
+        <div class="field">
+          <label for="fechaFinFiltro">Fecha fin</label>
+          <input id="fechaFinFiltro" type="date">
+        </div>
       </div>
     </div>
 
     <div class="status" id="status">Cargando...</div>
 
     <div class="summary-grid">
-      <div class="card">
+      <div class="card card-primary">
         <div class="card-title">Cliente</div>
-        <div class="card-value" id="cardCliente">-</div>
+        <div class="card-value small" id="cardCliente">-</div>
       </div>
+
       <div class="card">
         <div class="card-title">Producto</div>
-        <div class="card-value" id="cardProducto">-</div>
+        <div class="card-value small" id="cardProducto">-</div>
       </div>
-      <div class="card">
+
+      <div class="card card-success">
         <div class="card-title">Total venta</div>
         <div class="card-value" id="cardVenta">0.00</div>
       </div>
-      <div class="card">
+
+      <div class="card card-danger">
         <div class="card-title">Costo real</div>
         <div class="card-value" id="cardCosto">0.00</div>
       </div>
-      <div class="card">
+
+      <div class="card card-primary">
         <div class="card-title">Total cobrado</div>
         <div class="card-value" id="cardCobrado">0.00</div>
       </div>
-      <div class="card">
+
+      <div class="card card-success">
         <div class="card-title">Utilidad esperada</div>
         <div class="card-value" id="cardUtilidadEsperada">0.00</div>
       </div>
-      <div class="card">
+
+      <div class="card card-warning">
         <div class="card-title">Utilidad cobrada</div>
         <div class="card-value" id="cardUtilidadCobrada">0.00</div>
       </div>
+
       <div class="card">
         <div class="card-title">IGV</div>
         <div class="card-value" id="cardIgv">0.00</div>
       </div>
+
       <div class="card">
         <div class="card-title">Incluye IGV</div>
-        <div class="card-value" id="cardIncluyeIgv">-</div>
+        <div class="card-value small" id="cardIncluyeIgv">-</div>
       </div>
+
       <div class="card">
         <div class="card-title">Estado</div>
-        <div class="card-value" id="cardEstado">-</div>
+        <div class="card-value small" id="cardEstado">-</div>
       </div>
+
       <div class="card">
         <div class="card-title">Cantidad</div>
         <div class="card-value" id="cardCantidad">0</div>
       </div>
+
       <div class="card">
         <div class="card-title">Precio unitario</div>
         <div class="card-value" id="cardPrecioUnitario">0.00</div>
@@ -370,7 +700,14 @@
     </div>
 
     <div class="section">
-      <h2>Movimientos del trabajo</h2>
+      <div class="section-header">
+        <div>
+          <h2>Movimientos del trabajo</h2>
+          <div class="section-subtitle">Ingresos y egresos vinculados al trabajo seleccionado.</div>
+        </div>
+        <span class="muted-chip">Vista optimizada para móvil</span>
+      </div>
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -392,7 +729,13 @@
     </div>
 
     <div class="section">
-      <h2>Reparto de utilidad</h2>
+      <div class="section-header">
+        <div>
+          <h2>Reparto de utilidad</h2>
+          <div class="section-subtitle">Distribución estimada y cobrada por persona.</div>
+        </div>
+      </div>
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -412,7 +755,9 @@
   <!-- MODAL TRABAJO -->
   <div class="modal" id="modalTrabajo">
     <div class="modal-box">
-      <h2>Nuevo trabajo</h2>
+      <h2 class="modal-title">Nuevo trabajo</h2>
+      <p class="modal-subtitle">Crea el trabajo principal antes de registrar costos, cobros y reparto.</p>
+
       <form id="formTrabajo">
         <div class="form-group">
           <label for="trabajoCliente">Cliente</label>
@@ -458,8 +803,8 @@
         </div>
 
         <div class="actions">
-          <button type="button" id="cerrarTrabajo">Cerrar</button>
-          <button type="submit" id="guardarTrabajo">Guardar trabajo</button>
+          <button type="button" id="cerrarTrabajo" class="btn btn-secondary">Cerrar</button>
+          <button type="submit" id="guardarTrabajo" class="btn btn-primary">Guardar trabajo</button>
         </div>
       </form>
     </div>
@@ -468,7 +813,9 @@
   <!-- MODAL MOVIMIENTO -->
   <div class="modal" id="modalMovimiento">
     <div class="modal-box">
-      <h2>Nuevo movimiento</h2>
+      <h2 class="modal-title">Nuevo movimiento</h2>
+      <p class="modal-subtitle">Registra ingresos o egresos vinculados al trabajo seleccionado.</p>
+
       <form id="formMovimiento">
         <div class="form-group">
           <label for="movTrabajoId">Trabajo</label>
@@ -538,8 +885,8 @@
         </div>
 
         <div class="actions">
-          <button type="button" id="cerrarMovimiento">Cerrar</button>
-          <button type="submit" id="guardarMovimiento">Guardar movimiento</button>
+          <button type="button" id="cerrarMovimiento" class="btn btn-secondary">Cerrar</button>
+          <button type="submit" id="guardarMovimiento" class="btn btn-success">Guardar movimiento</button>
         </div>
       </form>
     </div>
@@ -548,7 +895,9 @@
   <!-- MODAL REPARTO -->
   <div class="modal" id="modalReparto">
     <div class="modal-box">
-      <h2>Nuevo reparto</h2>
+      <h2 class="modal-title">Nuevo reparto</h2>
+      <p class="modal-subtitle">Define el porcentaje de utilidad para cada persona del trabajo.</p>
+
       <form id="formReparto">
         <div class="form-group">
           <label for="repTrabajoId">Trabajo</label>
@@ -568,8 +917,8 @@
         <div class="hint">El porcentaje total por trabajo no puede superar 100%.</div>
 
         <div class="actions">
-          <button type="button" id="cerrarReparto">Cerrar</button>
-          <button type="submit" id="guardarReparto">Guardar reparto</button>
+          <button type="button" id="cerrarReparto" class="btn btn-secondary">Cerrar</button>
+          <button type="submit" id="guardarReparto" class="btn btn-primary">Guardar reparto</button>
         </div>
       </form>
     </div>
@@ -838,7 +1187,7 @@
       tablaMovimientos.innerHTML = data.map(item => `
         <tr>
           <td data-label="Fecha">${escapeHtml(item.fecha)}</td>
-          <td data-label="Tipo" class="${item.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(item.tipo)}</td>
+          <td data-label="Tipo"><span class="${item.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(item.tipo)}</span></td>
           <td data-label="Categoría">${escapeHtml(item.categoria)}</td>
           <td data-label="Proveedor">${escapeHtml(item.proveedor)}</td>
           <td data-label="Banco">${escapeHtml(item.banco)}</td>
