@@ -130,6 +130,11 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    .field {
+      width: 100%;
+      min-width: 0;
+    }
+
     .field label {
       display: block;
       margin-bottom: 6px;
@@ -138,11 +143,14 @@
       color: var(--muted);
     }
 
-    button,
+     button,
     input,
     select,
     textarea {
+      display: block;
       width: 100%;
+      max-width: 100%;
+      min-width: 0;
       font-size: 16px;
       border-radius: 14px;
       border: 1px solid var(--border-strong);
@@ -574,6 +582,39 @@
 
       tbody tr:hover td {
         background: #fbfdff;
+      }
+    }
+
+   @media (max-width: 759px) {
+      .panel,
+      .section {
+        overflow: hidden;
+        padding: 12px;
+      }
+
+      .filters-grid,
+      .actions-grid,
+      .summary-grid {
+        min-width: 0;
+      }
+
+      .field {
+        min-width: 0;
+      }
+
+      .field input,
+      .field select {
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      input[type="date"] {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        font-size: 15px;
+        padding-left: 12px;
+        padding-right: 10px;
       }
     }
 
