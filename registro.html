@@ -112,7 +112,8 @@
 
     .actions-grid,
     .filters-grid,
-    .summary-grid {
+    .summary-grid,
+    .bank-filters-grid {
       display: grid;
       gap: 10px;
     }
@@ -129,6 +130,12 @@
 
     .summary-grid {
       grid-template-columns: 1fr 1fr;
+    }
+
+    .bank-filters-grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
     }
 
     .field {
@@ -526,6 +533,11 @@
         grid-template-columns: repeat(4, 1fr);
       }
 
+      .bank-filters-grid {
+        grid-template-columns: 1.6fr 1fr 1fr;
+        align-items: end;
+      }
+
       .actions {
         display: flex;
         justify-content: flex-end;
@@ -853,6 +865,64 @@
     <div class="section">
       <div class="section-header">
         <div>
+          <h2>Operaciones bancarias registradas</h2>
+          <div class="section-subtitle">Operaciones guardadas para luego asociarlas a movimientos por número de operación.</div>
+        </div>
+        <span class="muted-chip">Usa el mismo filtro de fechas</span>
+      </div>
+
+      <div class="bank-filters-grid">
+        <div class="field">
+          <label for="bancoBusquedaFiltro">Buscar operación bancaria</label>
+          <input
+            id="bancoBusquedaFiltro"
+            type="text"
+            placeholder="Operación, monto, banco, observación..."
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="field">
+          <label for="bancoTipoFiltro">Tipo</label>
+          <select id="bancoTipoFiltro">
+            <option value="">Todos</option>
+            <option value="Ingreso">Ingreso</option>
+            <option value="Egreso">Egreso</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bancoFiltroSelect">Banco</label>
+          <select id="bancoFiltroSelect">
+            <option value="">Todos</option>
+            <option value="YAPE">YAPE</option>
+            <option value="BBVA">BBVA</option>
+            <option value="INTERBANK">INTERBANK</option>
+            <option value="BCP">BCP</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Tipo</th>
+              <th>Banco</th>
+              <th>N° Operación</th>
+              <th>Monto</th>
+              <th>Observación</th>
+            </tr>
+          </thead>
+          <tbody id="tablaBancoMovimientos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div>
           <h2>Reparto de utilidad</h2>
           <div class="section-subtitle">Distribución estimada y cobrada por persona.</div>
         </div>
@@ -1103,7 +1173,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzNcfKijGV2OxzMbygn-8uxbh4CrUWITZTSi4ycnqdE_2oCweAOy6sBXUtiZaIt_YHaog/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzsBX8jFyTo5so4lHwYzEUrTA7INl_uPqABS5XxkJoWpXOtesRwfT1wXnB7dNm5UQawBg/exec';
     const STORAGE_LAST_TIPO = 'trabajos.lastTipo';
     const STORAGE_LAST_BANCO = 'trabajos.lastBanco';
 
@@ -1121,12 +1191,16 @@
     const trabajoFiltro = document.getElementById('trabajoFiltro');
     const tipoFiltro = document.getElementById('tipoFiltro');
     const movimientoBusquedaFiltro = document.getElementById('movimientoBusquedaFiltro');
+    const bancoBusquedaFiltro = document.getElementById('bancoBusquedaFiltro');
+    const bancoTipoFiltro = document.getElementById('bancoTipoFiltro');
+    const bancoFiltroSelect = document.getElementById('bancoFiltroSelect');
     const fechaInicioFiltro = document.getElementById('fechaInicioFiltro');
     const fechaFinFiltro = document.getElementById('fechaFinFiltro');
     const estadoTrabajoUpdate = document.getElementById('estadoTrabajoUpdate');
     const btnActualizarEstado = document.getElementById('btnActualizarEstado');
 
     const tablaMovimientos = document.getElementById('tablaMovimientos');
+    const tablaBancoMovimientos = document.getElementById('tablaBancoMovimientos');
     const tablaRepartos = document.getElementById('tablaRepartos');
 
     const cardCliente = document.getElementById('cardCliente');
@@ -1338,32 +1412,33 @@
         bancoMovimientosCatalogo = json.data?.bancoMovimientos || [];
         proveedoresCatalogo = json.data?.proveedores || [];
         renderCatalogos();
+        renderBancoMovimientos();
       } catch (error) {
         console.error(error);
       }
     }
 
     function setFiltrosHoy() {
-  const hoy = getTodayLocal();
-  fechaInicioFiltro.value = hoy;
-  fechaFinFiltro.value = hoy;
-
-  if (detalleTrabajo) {
-    renderMovimientosFiltrados();
-  }
-}
+      const hoy = getTodayLocal();
+      fechaInicioFiltro.value = hoy;
+      fechaFinFiltro.value = hoy;
+      renderMovimientosFiltrados();
+      renderBancoMovimientos();
+    }
 
     function setFiltros7Dias() {
       const hoy = getTodayLocal();
       fechaInicioFiltro.value = addDays(hoy, -6);
       fechaFinFiltro.value = hoy;
       renderMovimientosFiltrados();
+      renderBancoMovimientos();
     }
 
     function setFiltrosTodo() {
       fechaInicioFiltro.value = '';
       fechaFinFiltro.value = '';
       renderMovimientosFiltrados();
+      renderBancoMovimientos();
     }
 
     function getRangoFechas() {
@@ -1468,6 +1543,61 @@
           <td data-label="Proveedor">${escapeHtml(item.proveedor)}</td>
           <td data-label="Banco">${escapeHtml(item.banco)}</td>
           <td data-label="Concepto">${escapeHtml(item.concepto)}</td>
+          <td data-label="N° Operación">${escapeHtml(item.numeroOperacion)}</td>
+          <td data-label="Monto">${formatMoney(item.monto)}</td>
+          <td data-label="Observación">${escapeHtml(item.observacion)}</td>
+        </tr>
+      `).join('');
+    }
+
+     function getBancoMovimientosFiltrados() {
+      const busqueda = normalizeText(bancoBusquedaFiltro.value);
+      const tipo = bancoTipoFiltro.value;
+      const banco = bancoFiltroSelect.value;
+      const { inicio, fin } = getRangoFechas();
+
+      return bancoMovimientosCatalogo.filter(item => {
+        const fechaSolo = String(item.fecha || '').slice(0, 10);
+        const montoNumero = Number(item.monto || 0);
+
+        const textoBanco = normalizeText([
+          item.fecha,
+          item.tipo,
+          item.banco,
+          item.numeroOperacion,
+          item.monto,
+          montoNumero.toFixed(2),
+          String(montoNumero.toFixed(2)).replace('.', ','),
+          item.observacion
+        ].join(' '));
+
+        const okTipo = !tipo || item.tipo === tipo;
+        const okBanco = !banco || item.banco === banco;
+        const okInicio = !inicio || fechaSolo >= inicio;
+        const okFin = !fin || fechaSolo <= fin;
+        const okBusqueda = !busqueda || textoBanco.includes(busqueda);
+
+        return okTipo && okBanco && okInicio && okFin && okBusqueda;
+      });
+    }
+
+    function renderBancoMovimientos() {
+      const data = getBancoMovimientosFiltrados();
+
+      if (!data.length) {
+        tablaBancoMovimientos.innerHTML = `
+          <tr>
+            <td colspan="6" class="empty">No hay operaciones bancarias</td>
+          </tr>
+        `;
+        return;
+      }
+
+      tablaBancoMovimientos.innerHTML = data.map(item => `
+        <tr>
+          <td data-label="Fecha">${escapeHtml(item.fecha)}</td>
+          <td data-label="Tipo"><span class="${item.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(item.tipo)}</span></td>
+          <td data-label="Banco">${escapeHtml(item.banco)}</td>
           <td data-label="N° Operación">${escapeHtml(item.numeroOperacion)}</td>
           <td data-label="Monto">${formatMoney(item.monto)}</td>
           <td data-label="Observación">${escapeHtml(item.observacion)}</td>
@@ -1728,8 +1858,20 @@ formReparto.addEventListener('submit', async function (e) {
 
     tipoFiltro.addEventListener('change', renderMovimientosFiltrados);
     movimientoBusquedaFiltro.addEventListener('input', renderMovimientosFiltrados);
-    fechaInicioFiltro.addEventListener('change', renderMovimientosFiltrados);
-    fechaFinFiltro.addEventListener('change', renderMovimientosFiltrados);
+
+    bancoBusquedaFiltro.addEventListener('input', renderBancoMovimientos);
+    bancoTipoFiltro.addEventListener('change', renderBancoMovimientos);
+    bancoFiltroSelect.addEventListener('change', renderBancoMovimientos);
+
+    fechaInicioFiltro.addEventListener('change', () => {
+      renderMovimientosFiltrados();
+      renderBancoMovimientos();
+    });
+
+    fechaFinFiltro.addEventListener('change', () => {
+      renderMovimientosFiltrados();
+      renderBancoMovimientos();
+    });
 
     btnHoy.addEventListener('click', setFiltrosHoy);
     btn7Dias.addEventListener('click', setFiltros7Dias);
