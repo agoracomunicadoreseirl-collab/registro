@@ -124,6 +124,7 @@
 
     .filters-grid {
       grid-template-columns: 1fr;
+      gap: 12px;
     }
 
     .summary-grid {
@@ -133,6 +134,19 @@
     .field {
       width: 100%;
       min-width: 0;
+    }
+
+    .field-date {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .date-shell {
+      width: 100%;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+      border-radius: 14px;
     }
 
     .field label {
@@ -585,11 +599,12 @@
       }
     }
 
-   @media (max-width: 759px) {
+  @media (max-width: 759px) {
       .panel,
       .section {
         overflow: hidden;
         padding: 12px;
+        
       }
 
       .filters-grid,
@@ -598,23 +613,40 @@
         min-width: 0;
       }
 
-      .field {
+      .field,
+      .field-date,
+      .date-shell {
         min-width: 0;
+        width: 100%;
+        max-width: 100%;
       }
 
       .field input,
-      .field select {
+      .field select,
+      .field textarea,
+      .field button {
         min-width: 0;
         max-width: 100%;
       }
 
-      input[type="date"] {
+    #btnActualizarEstado {
+        min-height: 50px;
+      }
+
+      .field-date input[type="date"] {
+        min-height: 48px;
+      }
+
+      .field-date input[type="date"] {
+        display: block;
         width: 100%;
-        min-width: 0;
         max-width: 100%;
-        font-size: 15px;
-        padding-left: 12px;
-        padding-right: 10px;
+        min-width: 0;
+        margin: 0;
+        padding: 11px 10px;
+        font-size: 14px;
+        line-height: 1.2;
+        border-radius: 14px;
       }
     }
 
@@ -669,16 +701,20 @@
           </select>
         </div>
 
-        <div class="field">
+        <div class="field field-date">
           <label for="fechaInicioFiltro">Fecha inicio</label>
-          <input id="fechaInicioFiltro" type="date">
+          <div class="date-shell">
+            <input id="fechaInicioFiltro" type="date">
+          </div>
+        </div>
+
+        <div class="field field-date">
+          <label for="fechaFinFiltro">Fecha fin</label>
+          <div class="date-shell">
+            <input id="fechaFinFiltro" type="date">
+          </div>
         </div>
         
-
-        <div class="field">
-          <label for="fechaFinFiltro">Fecha fin</label>
-          <input id="fechaFinFiltro" type="date">
-        </div>
         <div class="field">
         <label for="estadoTrabajoUpdate">Estado del trabajo</label>
         <select id="estadoTrabajoUpdate">
