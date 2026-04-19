@@ -1264,6 +1264,7 @@
 
       return detalleTrabajo.movimientos.filter(item => {
         const fechaSolo = String(item.fecha || '').slice(0, 10);
+        const montoNumero = Number(item.monto || 0);
         const textoMovimiento = normalizeText([
           item.fecha,
           item.tipo,
@@ -1273,7 +1274,8 @@
           item.concepto,
           item.numeroOperacion,
           item.monto,
-          Number(item.monto || 0).toFixed(2),
+          montoNumero.toFixed(2),
+          String(montoNumero.toFixed(2)).replace('.', ','),
           item.observacion
         ].join(' '));
 
