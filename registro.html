@@ -495,8 +495,8 @@
         grid-template-columns: repeat(6, 1fr);
       }
 
-      .filters-grid {
-        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+     .filters-grid {
+        grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr 180px;
         align-items: end;
       }
 
@@ -632,12 +632,27 @@
           <label for="fechaInicioFiltro">Fecha inicio</label>
           <input id="fechaInicioFiltro" type="date">
         </div>
+        
 
         <div class="field">
           <label for="fechaFinFiltro">Fecha fin</label>
           <input id="fechaFinFiltro" type="date">
         </div>
+        <div class="field">
+        <label for="estadoTrabajoUpdate">Estado del trabajo</label>
+        <select id="estadoTrabajoUpdate">
+          <option value="En proceso">En proceso</option>
+          <option value="Terminado">Terminado</option>
+          <option value="Entregado">Entregado</option>
+          <option value="Pagado">Pagado</option>
+        </select>
       </div>
+
+      <div class="field">
+        <label>&nbsp;</label>
+        <button type="button" id="btnActualizarEstado" class="btn btn-secondary">Actualizar estado</button>
+      </div>
+    </div>
     </div>
 
     <div class="status" id="status">Cargando...</div>
@@ -930,7 +945,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbyu20O24Rt5Am3LPVzeCOD22M9q_6mkm557pFrLMVxLw2fOCis3IXdmzSdTAyw98UQ/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyHGNhFSLjrzBJlJGozsQ8Yg6fEzGN9NCLqq_Yd1mcbVb_kuXxgrUb3A-ewTiH8x6B0LA/exec';
     const STORAGE_LAST_TIPO = 'trabajos.lastTipo';
     const STORAGE_LAST_BANCO = 'trabajos.lastBanco';
 
@@ -948,6 +963,8 @@
     const tipoFiltro = document.getElementById('tipoFiltro');
     const fechaInicioFiltro = document.getElementById('fechaInicioFiltro');
     const fechaFinFiltro = document.getElementById('fechaFinFiltro');
+    const estadoTrabajoUpdate = document.getElementById('estadoTrabajoUpdate');
+    const btnActualizarEstado = document.getElementById('btnActualizarEstado');
 
     const tablaMovimientos = document.getElementById('tablaMovimientos');
     const tablaRepartos = document.getElementById('tablaRepartos');
@@ -1155,6 +1172,7 @@
         cardIgv.textContent = '0.00';
         cardIncluyeIgv.textContent = '-';
         cardEstado.textContent = '-';
+        estadoTrabajoUpdate.value = 'En proceso';
         cardCantidad.textContent = '0';
         cardPrecioUnitario.textContent = '0.00';
         return;
@@ -1173,6 +1191,7 @@
       cardIgv.textContent = formatMoney(r.igv);
       cardIncluyeIgv.textContent = r.incluyeIGV || '-';
       cardEstado.textContent = t.estado || '-';
+      estadoTrabajoUpdate.value = t.estado || 'En proceso';
       cardCantidad.textContent = String(t.cantidad || 0);
       cardPrecioUnitario.textContent = formatMoney(t.precioUnitarioVenta);
     }
@@ -1224,6 +1243,36 @@
           <td data-label="Utilidad cobrada">${formatMoney(item.montoUtilidadCobrada)}</td>
         </tr>
       `).join('');
+    }
+
+    async function updateEstadoTrabajo() {
+      const trabajoId = trabajoFiltro.value;
+      const estado = estadoTrabajoUpdate.value;
+
+      if (!trabajoId) {
+        alert('Selecciona un trabajo');
+        return;
+      }
+
+      btnActualizarEstado.disabled = true;
+      btnActualizarEstado.textContent = 'Actualizando...';
+
+      try {
+        const json = await apiPost('updateTrabajoEstado', { trabajoId, estado });
+
+        if (!json.ok) {
+          alert(json.error || 'No se pudo actualizar el estado');
+          return;
+        }
+
+        await loadTrabajos(trabajoId);
+      } catch (error) {
+        console.error(error);
+        alert('Error al actualizar estado');
+      } finally {
+        btnActualizarEstado.disabled = false;
+        btnActualizarEstado.textContent = 'Actualizar estado';
+      }
     }
 
     async function loadTrabajos(selectTrabajoId = '') {
@@ -1400,6 +1449,7 @@
     btnHoy.addEventListener('click', setFiltrosHoy);
     btn7Dias.addEventListener('click', setFiltros7Dias);
     btnTodo.addEventListener('click', setFiltrosTodo);
+    btnActualizarEstado.addEventListener('click', updateEstadoTrabajo);
 
     [modalTrabajo, modalMovimiento, modalReparto].forEach(modal => {
       modal.addEventListener('click', function (e) {
