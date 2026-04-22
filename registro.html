@@ -113,7 +113,8 @@
     .actions-grid,
     .filters-grid,
     .summary-grid,
-    .bank-filters-grid {
+    .bank-filters-grid,
+    .bank-summary-grid {
       display: grid;
       gap: 10px;
     }
@@ -132,9 +133,15 @@
       grid-template-columns: 1fr 1fr;
     }
 
-    .bank-filters-grid {
+     .bank-filters-grid {
       grid-template-columns: 1fr;
       gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .bank-summary-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
       margin-bottom: 12px;
     }
 
@@ -538,6 +545,10 @@
         align-items: end;
       }
 
+      .bank-summary-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
       .actions {
         display: flex;
         justify-content: flex-end;
@@ -629,9 +640,11 @@
         padding: 12px;
       }
 
-      .filters-grid,
+     .filters-grid,
       .actions-grid,
-      .summary-grid {
+      .summary-grid,
+      .bank-filters-grid,
+      .bank-summary-grid {
         min-width: 0;
         width: 100%;
       }
@@ -871,7 +884,7 @@
         <span class="muted-chip">Usa el mismo filtro de fechas</span>
       </div>
 
-      <div class="bank-filters-grid">
+       <div class="bank-filters-grid">
         <div class="field">
           <label for="bancoBusquedaFiltro">Buscar operación bancaria</label>
           <input
@@ -900,6 +913,23 @@
             <option value="INTERBANK">INTERBANK</option>
             <option value="BCP">BCP</option>
           </select>
+        </div>
+      </div>
+
+      <div class="bank-summary-grid">
+        <div class="card card-success">
+          <div class="card-title">Ingresos bancarios</div>
+          <div class="card-value" id="cardBancoIngresos">0.00</div>
+        </div>
+
+        <div class="card card-danger">
+          <div class="card-title">Egresos bancarios</div>
+          <div class="card-value" id="cardBancoEgresos">0.00</div>
+        </div>
+
+        <div class="card card-primary">
+          <div class="card-title">Saldo bancario</div>
+          <div class="card-value" id="cardBancoSaldo">0.00</div>
         </div>
       </div>
 
@@ -1118,6 +1148,11 @@
       </div>
 
       <div class="form-group">
+        <label for="bancoFecha">Fecha</label>
+        <input id="bancoFecha" name="fecha" type="date" required>
+      </div>
+
+      <div class="form-group">
         <label for="bancoNumeroOperacion">Número de operación</label>
         <input id="bancoNumeroOperacion" name="numeroOperacion" inputmode="numeric" required>
       </div>
@@ -1173,7 +1208,7 @@
   </div>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzsBX8jFyTo5so4lHwYzEUrTA7INl_uPqABS5XxkJoWpXOtesRwfT1wXnB7dNm5UQawBg/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxxU8850LVi_vtuzBN9YuvxBQ-W9y26weyFsVqOA7-qqVZj07bNzSio7a1AavnURJQq_w/exec';
     const STORAGE_LAST_TIPO = 'trabajos.lastTipo';
     const STORAGE_LAST_BANCO = 'trabajos.lastBanco';
 
