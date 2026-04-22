@@ -1251,6 +1251,10 @@
     const cardCantidad = document.getElementById('cardCantidad');
     const cardPrecioUnitario = document.getElementById('cardPrecioUnitario');
 
+    const cardBancoIngresos = document.getElementById('cardBancoIngresos');
+    const cardBancoEgresos = document.getElementById('cardBancoEgresos');
+    const cardBancoSaldo = document.getElementById('cardBancoSaldo');
+
    const modalTrabajo = document.getElementById('modalTrabajo');
     const modalMovimiento = document.getElementById('modalMovimiento');
     const modalBanco = document.getElementById('modalBanco');
@@ -1616,29 +1620,49 @@
       });
     }
 
+    function renderBancoResumen() {
+  const data = getBancoMovimientosFiltrados();
+
+  const ingresos = data
+    .filter(item => item.tipo === 'Ingreso')
+    .reduce((acc, item) => acc + Number(item.monto || 0), 0);
+
+  const egresos = data
+    .filter(item => item.tipo === 'Egreso')
+    .reduce((acc, item) => acc + Number(item.monto || 0), 0);
+
+  const saldo = ingresos - egresos;
+
+  cardBancoIngresos.textContent = formatMoney(ingresos);
+  cardBancoEgresos.textContent = formatMoney(egresos);
+  cardBancoSaldo.textContent = formatMoney(saldo);
+}
+    
     function renderBancoMovimientos() {
-      const data = getBancoMovimientosFiltrados();
+  const data = getBancoMovimientosFiltrados();
 
-      if (!data.length) {
-        tablaBancoMovimientos.innerHTML = `
-          <tr>
-            <td colspan="6" class="empty">No hay operaciones bancarias</td>
-          </tr>
-        `;
-        return;
-      }
+  renderBancoResumen();
 
-      tablaBancoMovimientos.innerHTML = data.map(item => `
-        <tr>
-          <td data-label="Fecha">${escapeHtml(item.fecha)}</td>
-          <td data-label="Tipo"><span class="${item.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(item.tipo)}</span></td>
-          <td data-label="Banco">${escapeHtml(item.banco)}</td>
-          <td data-label="N° Operación">${escapeHtml(item.numeroOperacion)}</td>
-          <td data-label="Monto">${formatMoney(item.monto)}</td>
-          <td data-label="Observación">${escapeHtml(item.observacion)}</td>
-        </tr>
-      `).join('');
-    }
+  if (!data.length) {
+    tablaBancoMovimientos.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty">No hay operaciones bancarias</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tablaBancoMovimientos.innerHTML = data.map(item => `
+    <tr>
+      <td data-label="Fecha">${escapeHtml(item.fecha)}</td>
+      <td data-label="Tipo"><span class="${item.tipo === 'Ingreso' ? 'badge-ingreso' : 'badge-egreso'}">${escapeHtml(item.tipo)}</span></td>
+      <td data-label="Banco">${escapeHtml(item.banco)}</td>
+      <td data-label="N° Operación">${escapeHtml(item.numeroOperacion)}</td>
+      <td data-label="Monto">${formatMoney(item.monto)}</td>
+      <td data-label="Observación">${escapeHtml(item.observacion)}</td>
+    </tr>
+  `).join('');
+}
 
     function renderRepartos() {
       const reparto = (detalleTrabajo && detalleTrabajo.resumen && detalleTrabajo.resumen.reparto) || [];
